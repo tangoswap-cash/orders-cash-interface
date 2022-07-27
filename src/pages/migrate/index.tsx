@@ -17,7 +17,7 @@ import { useActiveWeb3React } from '../../hooks'
 import { tryParseAmount } from '../../functions/parse'
 import { ApprovalState, useApproveCallback } from '../../hooks/useApproveCallback'
 import useMigrateState, { MigrateState } from '../../hooks/useMigrateState'
-import CloseIcon from '../../components/CloseIcon';
+import CloseIcon from '../../components/CloseIcon'
 // import LPToken from '../../types/LPToken'
 // import MetamaskError from '../../types/MetamaskError'
 import Head from 'next/head'
@@ -34,7 +34,7 @@ const StyledNumericalInput = styled(Input.Numeric)`
 `
 
 const AmountInput = ({ state }: { state: MigrateState }) => {
-    /*
+  /*
     const { i18n } = useLingui()
     const onPressMax = useCallback(() => {
         if (state.selectedLPToken) {
@@ -128,24 +128,23 @@ const AmountInput = ({ state }: { state: MigrateState }) => {
     )
     */
 
-   return (
-     <>
-        <div>
-        </div>
-     </>
-   )
+  return (
+    <>
+      <div></div>
+    </>
+  )
 }
 
 interface PositionCardProps {
-    lpToken: any /* LPToken */
-    onToggle: (lpToken: any /* LPToken */) => void
-    isSelected: boolean
-    updating: boolean
-    exchange: string | undefined
+  lpToken: any /* LPToken */
+  onToggle: (lpToken: any /* LPToken */) => void
+  isSelected: boolean
+  updating: boolean
+  exchange: string | undefined
 }
 
 const LPTokenSelect = ({ lpToken, onToggle, isSelected, updating, exchange }: PositionCardProps) => {
-    /*
+  /*
     return (
         <div
             key={lpToken.address}
@@ -164,14 +163,11 @@ const LPTokenSelect = ({ lpToken, onToggle, isSelected, updating, exchange }: Po
         </div>
     )
     */
-   return (
-       <div>
-       </div>
-   )
+  return <div></div>
 }
 
 const MigrateModeSelect = ({ state }: { state: MigrateState }) => {
-    /*
+  /*
     function toggleMode(mode = undefined) {
         state.setMode(mode !== state.mode ? mode : undefined)
     }
@@ -217,16 +213,15 @@ const MigrateModeSelect = ({ state }: { state: MigrateState }) => {
         </>
     )
     */
-   return (
-     <>
-        <div>
-        </div>
+  return (
+    <>
+      <div></div>
     </>
-   )
+  )
 }
 
 const MigrateButtons = ({ state, exchange }: { state: MigrateState; exchange: string | undefined }) => {
-    /*
+  /*
     const [error, setError] = useState<MetamaskError>({})
     const sushiRollContract = useSushiRollContract(
         state.selectedLPToken?.version ? state.selectedLPToken?.version : undefined
@@ -315,43 +310,41 @@ const MigrateButtons = ({ state, exchange }: { state: MigrateState; exchange: st
 }
 
 const ExchangeLiquidityPairs = ({ state, exchange }: { state: MigrateState; exchange: undefined | string }) => {
-    function onToggle(lpToken: any /* LPToken */) {
-        state.setSelectedLPToken(state.selectedLPToken !== lpToken ? lpToken : undefined)
-        state.setAmount('')
-    }
+  function onToggle(lpToken: any /* LPToken */) {
+    state.setSelectedLPToken(state.selectedLPToken !== lpToken ? lpToken : undefined)
+    state.setAmount('')
+  }
 
-    if (!state.mode) {
-        return null
-    }
+  if (!state.mode) {
+    return null
+  }
 
-    if (state.lpTokens.length === 0) {
-        return (
-            <AutoColumn style={{ minHeight: 200, justifyContent: 'center', alignItems: 'center' }}>
-                <div className="font-medium">
-                    No Liquidity found.
-                </div>
-            </AutoColumn>
-        )
-    }
-
+  if (state.lpTokens.length === 0) {
     return (
-        <>
-            {state.lpTokens.reduce<JSX.Element[]>((acc, lpToken) => {
-                if ((lpToken.balance as CurrencyAmount<Token>).greaterThan(0)) {
-                    acc.push(
-                        <LPTokenSelect
-                            lpToken={lpToken}
-                            onToggle={onToggle}
-                            isSelected={state.selectedLPToken === lpToken}
-                            updating={state.updatingLPTokens}
-                            exchange={exchange}
-                        />
-                    )
-                }
-                return acc
-            }, [])}
-        </>
+      <AutoColumn style={{ minHeight: 200, justifyContent: 'center', alignItems: 'center' }}>
+        <div className="font-medium">No Liquidity found.</div>
+      </AutoColumn>
     )
+  }
+
+  return (
+    <>
+      {state.lpTokens.reduce<JSX.Element[]>((acc, lpToken) => {
+        if ((lpToken.balance as CurrencyAmount<Token>).greaterThan(0)) {
+          acc.push(
+            <LPTokenSelect
+              lpToken={lpToken}
+              onToggle={onToggle}
+              isSelected={state.selectedLPToken === lpToken}
+              updating={state.updatingLPTokens}
+              exchange={exchange}
+            />
+          )
+        }
+        return acc
+      }, [])}
+    </>
+  )
 }
 
 export default function MigrateV2() {
@@ -372,23 +365,23 @@ export default function MigrateV2() {
   return (
     <Container id="migrate-page" className="py-4 space-y-6 md:py-8 lg:py-12" maxWidth="2xl">
       <Head>
-          <title key="title">Migrate LP tokens | Tango</title>
+          <title key="title">Migrate LP tokens | Orders.Cash</title>
           <meta
             key="description"
             name="description"
             content="Migrate LP tokens to Tango LP tokens"
           />
-          <meta key="twitter:url" name="twitter:url" content="https://tangoswap.cash/migrate" />
+          <meta key="twitter:url" name="twitter:url" content="https://orders.cash/migrate" />
           <meta key="twitter:title" name="twitter:title" content="MIGRATE LP" />
           <meta
             key="twitter:description"
             name="twitter:description"
             content="Migrate LP tokens to Tango LP tokens"
           />
-          <meta key="twitter:image" name="twitter:image" content="https://tangoswap.cash/xtango-sign.png" />
+          <meta key="twitter:image" name="twitter:image" content="https://orders.cash/xtango-sign.png" />
           <meta key="og:title" property="og:title" content="MIGRATE LP" />
-          <meta key="og:url" property="og:url" content="https://tangoswap.cash/migrate" />
-          <meta key="og:image" property="og:image" content="https://tangoswap.cash/xtango-sign.png" />
+          <meta key="og:url" property="og:url" content="https://orders.cash/migrate" />
+          <meta key="og:image" property="og:image" content="https://orders.cash/xtango-sign.png" />
           <meta
             key="og:description"
             property="og:description"
@@ -435,9 +428,5 @@ export default function MigrateV2() {
     </Container>
   )
   */
-  return (
-    <div>
-    </div>
-  )
-
+  return <div></div>
 }

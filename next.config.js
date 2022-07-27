@@ -33,7 +33,7 @@ const nextConfig = {
         tls: false,
         net: false,
         fs: false,
-      }
+      },
     }
 
     return config
@@ -45,87 +45,26 @@ const nextConfig = {
     disable: process.env.NODE_ENV === 'development',
   },
   images: {
-    domains: [
-      'raw.githubusercontent.com',
-      'metadata.bch.domains',
-    ],
+    domains: ['raw.githubusercontent.com', 'metadata.bch.domains'],
   },
   reactStrictMode: true,
-  async redirects() {
-    return [
-      {
-        source: '/',
-        destination: '/smart-swap',
-        permanent: true,
-      },
-      {
-        source: '/',
-        destination: '/limit-order',
-        permanent: true,
-      },
-      {
-        source: '/yield',
-        destination: '/farm',
-        permanent: true,
-      },
-      // Analytics
-      {
-        source: '/analytics',
-        destination: '/analytics/dashboard',
-        permanent: true,
-      },
-      {
-        source: '/portfolio',
-        destination: '/analytics/portfolio',
-        permanent: true,
-      },
-    ]
-  },
   async rewrites() {
     return [
       {
-        source: '/stake',
-        destination: '/bar',
+        source: '/',
+        destination: '/exchange/limit-order',
       },
       {
-        source: '/add/:token*',
-        destination: '/exchange/add/:token*',
+        source: '/:token*',
+        destination: '/exchange/limit-order/:token*',
       },
       {
-        source: '/remove/:token*',
-        destination: '/exchange/remove/:token*',
-      },
-      {
-        source: '/create/:token*',
-        destination: '/exchange/add/:token*',
-      },
-      {
-        source: '/swap',
-        destination: '/exchange/swap',
-      },
-      {
-        source: '/swap/:token*',
-        destination: '/exchange/swap/:token*',
-      },
-      {
-        source: '/smart-swap',
-        destination: '/exchange/smart-swap',
-      },
-      {
-        source: '/smart-swap/:token*',
-        destination: '/exchange/smart-swap/:token*',
+        source: '/limit-order',
+        destination: '/exchange/limit-order',
       },
       {
         source: '/limit-order/:token*',
         destination: '/exchange/limit-order/:token*',
-      },
-      {
-        source: '/pool',
-        destination: '/exchange/pool',
-      },
-      {
-        source: '/find',
-        destination: '/exchange/find',
       },
     ]
   },

@@ -1,11 +1,4 @@
-import {
-  ChainId,
-  Currency,
-  CurrencyAmount,
-  JSBI,
-  Token,
-  TradeSmart
-} from '@tangoswapcash/sdk'
+import { ChainId, Currency, CurrencyAmount, JSBI, Token, TradeSmart } from '@tangoswapcash/sdk'
 import { ApprovalState, useApproveCallbackFromTradeSmart } from '../../../hooks/useApproveCallback'
 import { ArrowWrapper, BottomGrouping, SwapCallbackError } from '../../../features/exchange-v1/swap/styleds'
 import { ButtonConfirmed, ButtonError } from '../../../components/Button'
@@ -50,13 +43,11 @@ import MinerTip from '../../../features/exchange-v1/swap/MinerTip'
 import ProgressSteps from '../../../components/ProgressSteps'
 import SwapHeader from '../../../features/trade/Header'
 import TokenWarningModal from '../../../modals/TokenWarningModal'
-import SmartSwapInfo from '../../../modals/SmartSwapInfo'
 import { default as TradePrice, GetRateText } from '../../../features/exchange-v1/swap/TradePrice'
-import SmartSwapRouting from "../../../features/exchange-v1/swap/SmartSwapRouting"
+import SmartSwapRouting from '../../../features/exchange-v1/swap/SmartSwapRouting'
 import Typography from '../../../components/Typography'
 import UnsupportedCurrencyFooter from '../../../features/exchange-v1/swap/UnsupportedCurrencyFooter'
 import Web3Connect from '../../../components/Web3Connect'
-import BurnedTangoCounter from '../../../components/BurnedTangoCounter'
 import { classNames } from '../../../functions'
 import { computeFiatValuePriceImpact } from '../../../functions/trade'
 import confirmPriceImpactWithoutFee from '../../../features/exchange-v1/swap/confirmPriceImpactWithoutFee'
@@ -74,6 +65,8 @@ import { useSmartSwapCallback } from '../../../hooks/useSmartSwapCallback'
 import { useUSDCValue } from '../../../hooks/useUSDCPrice'
 import { warningSeverity } from '../../../functions/prices'
 import Image from 'next/image'
+import BurnedTangoCounter from '../../../components/BurnedTangoCounter'
+import SmartSwapInfo from '../../../modals/SmartSwapInfo'
 
 export default function Swap() {
   const { i18n } = useLingui()
@@ -136,7 +129,7 @@ export default function Swap() {
     currencies,
     inputError: swapInputError,
     allowedSlippage,
-    feePercent
+    feePercent,
   } = useDerivedSmartSwapInfo(doArcher)
 
   const {
@@ -194,7 +187,6 @@ export default function Swap() {
     router.push('/swap/')
   }, [router])
 
-
   // modal and loading
   const [{ showConfirm, tradeToConfirm, swapErrorMessage, attemptingTxn, txHash }, setSwapState] = useState<{
     showConfirm: boolean
@@ -218,7 +210,12 @@ export default function Swap() {
   }
 
   // check whether the user has approved the aggregator on the input token
-  const [approvalState, approveCallback] = useApproveCallbackFromTradeSmart(trade, allowedSlippage, feePercent, doArcher)
+  const [approvalState, approveCallback] = useApproveCallbackFromTradeSmart(
+    trade,
+    allowedSlippage,
+    feePercent,
+    doArcher
+  )
 
   const signatureData = undefined
 
@@ -264,7 +261,7 @@ export default function Swap() {
     allowedSlippage,
     feePercent,
     // recipient,
-    signatureData,
+    signatureData
     // doArcher ? ttl : undefined
   )
 
@@ -341,7 +338,7 @@ export default function Swap() {
     (approvalState === ApprovalState.NOT_APPROVED ||
       approvalState === ApprovalState.PENDING ||
       (approvalSubmitted && approvalState === ApprovalState.APPROVED))
-      // && !(priceImpactSeverity > 3 && !isExpertMode)
+  // && !(priceImpactSeverity > 3 && !isExpertMode)
 
   const handleConfirmDismiss = useCallback(() => {
     setSwapState({
@@ -413,18 +410,17 @@ export default function Swap() {
   //   }
   // }, [chainId, previousChainId, router]);
 
-
   const [refreshingPrice, setRefreshingPrice] = useState(false)
   const refreshPrice = () => {
-      if(formattedAmounts[Field.INPUT] || formattedAmounts[Field.OUTPUT]){
-        setRefreshingPrice(true)
-        setTimeout(() => {
-          independentField === Field.INPUT
+    if (formattedAmounts[Field.INPUT] || formattedAmounts[Field.OUTPUT]) {
+      setRefreshingPrice(true)
+      setTimeout(() => {
+        independentField === Field.INPUT
           ? handleTypeInput(formattedAmounts[Field.INPUT])
           : handleTypeOutput(formattedAmounts[Field.OUTPUT])
-          setRefreshingPrice(false)
-        }, 700);
-      }
+        setRefreshingPrice(false)
+      }, 700)
+    }
   }
 
   const [swapInfoOpen, setSwapInfoOpen] = useState(false)
@@ -432,12 +428,12 @@ export default function Swap() {
   return (
     <Container id="swap-page" className="py-4 md:py-8 lg:py-12">
       <Head>
-        <title>{i18n._(t`TANGOswap`)} | TANGOswap</title>
-        {/* <title>{GetRateText({price: trade?.executionPrice, showInverted}) || i18n._(t`TANGOswap`)} | TANGOswap</title> */}
+        <title>Orders.Cash</title>
+        {/* <title>{GetRateText({price: trade?.executionPrice, showInverted}) || i18n._(t`Orders.Cash`)} | Orders.Cash</title> */}
         <meta
           key="description"
           name="description"
-          content="TANGOswap allows for swapping of SEP20 compatible tokens"
+          content="Orders.Cash allows for swapping of SEP20 compatible tokens"
         />
       </Head>
       <TokenWarningModal
@@ -470,7 +466,7 @@ export default function Swap() {
             onDismiss={handleConfirmDismiss}
             minerBribe={doArcher ? archerETHTip : undefined}
           />
-          <div className={refreshingPrice ? "opacity-40 pointer-events-none" : undefined}>
+          <div className={refreshingPrice ? 'opacity-40 pointer-events-none' : undefined}>
             <CurrencyInputPanel
               // priceImpact={priceImpact}
               label={
@@ -495,8 +491,8 @@ export default function Swap() {
                   className="z-10 -mt-6 -mb-6 rounded-full"
                   onClick={() => {
                     setApprovalSubmitted(false) // reset 2 step UI for approvals
-                    handleTypeInput("") // clear input value
-                    handleTypeOutput("") // clear output value
+                    handleTypeInput('') // clear input value
+                    handleTypeOutput('') // clear output value
                     onSwitchTokens()
                   }}
                 >
@@ -558,12 +554,18 @@ export default function Swap() {
                     setShowInverted={setShowInverted}
                     className="bg-dark-900"
                   />
-                  <SmartSwapRouting outputCurrency={currencies[Field.OUTPUT]} inputCurrency={currencies[Field.INPUT]} distribution={trade?.distribution}/>
+                  <SmartSwapRouting
+                    outputCurrency={currencies[Field.OUTPUT]}
+                    inputCurrency={currencies[Field.INPUT]}
+                    distribution={trade?.distribution}
+                  />
                 </div>
               )}
             </div>
-            <div className='ml-1 mt-1'>
-              <button className='text-sm hover:text-high-emphesis' onClick={() => setSwapInfoOpen(true)}>What is SmartSwap?</button>
+            <div className="ml-1 mt-1">
+              <button className="text-sm hover:text-high-emphesis" onClick={() => setSwapInfoOpen(true)}>
+                What is SmartSwap?
+              </button>
               <SmartSwapInfo isOpen={swapInfoOpen} setIsOpen={setSwapInfoOpen} />
             </div>
           </div>
@@ -653,9 +655,7 @@ export default function Swap() {
                       width: '100%',
                     }}
                     id="swap-button"
-                    disabled={
-                      !isValid || approvalState !== ApprovalState.APPROVED
-                    }
+                    disabled={!isValid || approvalState !== ApprovalState.APPROVED}
                     error={isValid}
                   >
                     {i18n._(t`Swap`)}
@@ -682,9 +682,7 @@ export default function Swap() {
                 // error={isValid && !swapCallbackError}
                 error={false}
               >
-                {swapInputError
-                  ? swapInputError
-                  : i18n._(t`Swap`)}
+                {swapInputError ? swapInputError : i18n._(t`Swap`)}
               </ButtonError>
             )}
             {showApproveFlow && (
@@ -709,14 +707,16 @@ export default function Swap() {
         </div>
       </DoubleGlowShadow>
 
+      {/* <div className="relative hidden h-20 lg:block">
+        <Image layout="fill" objectFit="contain" objectPosition="bottom" src="/smartswap.png" alt="SmartSwap" />
+      </div> */}
       <div className="text-center flex items-center absolute bottom-20 lg:bottom-2 right-2">
-        <p className="font-bold mt-2 mr-3">Powered by:</p>
-        <div className="relative h-24 w-24">
-          <Image layout="fill" objectFit="contain" objectPosition="bottom" src="/smart-swap-neon-white.png" alt="Smart Swap" />
+        <div className="relative h-24 w-28">
+          <Image layout="fill" objectFit="contain" src="/smartswap.png" alt="Smart Swap" />
         </div>
       </div>
 
-      <div className='mt-2 lg:mt-6'>
+      <div className="mt-2 lg:mt-6">
         <BurnedTangoCounter />
       </div>
     </Container>

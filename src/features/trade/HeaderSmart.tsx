@@ -26,11 +26,18 @@ interface ExchangeHeaderProps {
   output?: Currency
   allowedSlippage?: Percent
   feePercent?: Percent
-  refreshPrice?: () => void;
-  refreshingPrice?: boolean;
+  refreshPrice?: () => void
+  refreshingPrice?: boolean
 }
 
-const ExchangeHeader: FC<ExchangeHeaderProps> = ({ input, output, allowedSlippage, feePercent, refreshPrice, refreshingPrice }) => {
+const ExchangeHeader: FC<ExchangeHeaderProps> = ({
+  input,
+  output,
+  allowedSlippage,
+  feePercent,
+  refreshPrice,
+  refreshingPrice,
+}) => {
   const { i18n } = useLingui()
   const { chainId } = useActiveWeb3React()
   const router = useRouter()
@@ -39,9 +46,9 @@ const ExchangeHeader: FC<ExchangeHeaderProps> = ({ input, output, allowedSlippag
   const isLimitOrder = router.asPath.startsWith('/limit-order')
 
   useEffect(() => {
-    const interval = setInterval(refreshPrice, 10000);
-    return () => clearInterval(interval);
-  }, [refreshPrice]);
+    const interval = setInterval(refreshPrice, 10000)
+    return () => clearInterval(interval)
+  }, [refreshPrice])
 
   return (
     <div className="flex items-center justify-between mb-4 space-x-3">
@@ -65,7 +72,7 @@ const ExchangeHeader: FC<ExchangeHeaderProps> = ({ input, output, allowedSlippag
           }}
         >
           <a className="flex items-center justify-center px-4 text-base font-medium text-center rounded-md text-secondary hover:text-high-emphesis ">
-            {i18n._(t`SmartSwap`)} <sup>NEW</sup>
+            {i18n._(t`Orders.Cash`)}
           </a>
         </NavLink>
         <NavLink
@@ -100,13 +107,16 @@ const ExchangeHeader: FC<ExchangeHeaderProps> = ({ input, output, allowedSlippag
               </div>
             </div>
           )*/}
-          {refreshPrice &&
-            <div onClick={refreshPrice} className="relative flex items-center justify-center rounded hover:bg-dark-800 w-8 h-8 rounded cursor-pointer">
-              <span className={refreshingPrice ? "animate-spin opacity-40" : undefined}>
+          {refreshPrice && (
+            <div
+              onClick={refreshPrice}
+              className="relative flex items-center justify-center rounded hover:bg-dark-800 w-8 h-8 rounded cursor-pointer"
+            >
+              <span className={refreshingPrice ? 'animate-spin opacity-40' : undefined}>
                 <RefreshIcon className="w-[26px] h-[26px] transform" />
               </span>
             </div>
-          }
+          )}
           <div className="relative flex items-center w-full h-full rounded hover:bg-dark-800">
             <Settings placeholderSlippage={allowedSlippage} />
           </div>

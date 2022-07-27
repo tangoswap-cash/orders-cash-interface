@@ -102,8 +102,6 @@ const LimitOrderButton: FC<LimitOrderButtonProps> = ({ currency, color, ...rest 
     chainId && ORDERS_CASH_V1_ADDRESS[chainId]
   )
 
-  console.log('tokenApprovalState: ', tokenApprovalState)
-
   const showTokenApprove =
     chainId &&
     currency &&

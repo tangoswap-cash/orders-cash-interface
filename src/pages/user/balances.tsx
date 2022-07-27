@@ -41,7 +41,7 @@ function Balances() {
   return (
     <>
       <Head>
-        <title>Balances | Tango</title>
+        <title>Balances | Orders.Cash</title>
         <meta key="description" name="description" content="" />
       </Head>
       <Card
@@ -53,11 +53,7 @@ function Balances() {
                 <div className="mr-4 text-3xl text-high-emphesis">{i18n._(t`Mirror`)}</div>
               </div>
               <div className="flex justify-end w-2/3 py-4 md:py-0">
-                <Search
-                  search={search}
-                  placeholder={i18n._(t`Search by name, symbol, address`)}
-                  term={term}
-                />
+                <Search search={search} placeholder={i18n._(t`Search by name, symbol, address`)} term={term} />
               </div>
             </div>
           </Card.Header>
