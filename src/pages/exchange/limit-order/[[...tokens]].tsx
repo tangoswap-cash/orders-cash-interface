@@ -39,6 +39,7 @@ import { t } from '@lingui/macro'
 import { useActiveWeb3React } from '../../../hooks'
 import { useExpertModeManager } from '../../../state/user/hooks'
 import { useLingui } from '@lingui/react'
+import Image from 'next/image'
 
 const areEqual = (first, second) => {
   if (first.length !== second.length) {
@@ -343,6 +344,13 @@ function LimitOrder() {
           </div>
         </DoubleGlowShadow>
       </ExpertModePanel>
+
+      <div className="text-center flex items-center absolute bottom-20 lg:bottom-2 right-2">
+        <div className="relative h-24 w-28">
+          <Image layout="fill" objectFit="contain" src="/orderscash.png" alt="Orders.Cash" />
+        </div>
+      </div>
+
     </Container>
   )
 }
