@@ -289,7 +289,7 @@ function TakeOrderPage() {
   )
 
   const makerAddress = useGetSigner(order.coinsToMaker, order.coinsToTaker, dueTime80_v8_version8, order.r, order.s)
-  console.log('makerAddress: ', makerAddress)
+  // console.log('makerAddress: ', makerAddress)
 
   const handleSwap = useCallback(() => {
     if (!swapCallback) {
@@ -397,7 +397,7 @@ function TakeOrderPage() {
   return (
     <Container id="take-order-page" className="py-4 md:py-8 lg:py-12" maxWidth="lg">
       <Head>
-        <title>Take Order | Tango</title>
+        <title>Take Order | Orders.Cash</title>
         <meta name="description" content="Take order..." />
       </Head>
 

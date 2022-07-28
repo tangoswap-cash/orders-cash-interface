@@ -39,6 +39,7 @@ import { t } from '@lingui/macro'
 import { useActiveWeb3React } from '../../../hooks'
 import { useExpertModeManager } from '../../../state/user/hooks'
 import { useLingui } from '@lingui/react'
+import Image from 'next/image'
 
 const areEqual = (first, second) => {
   if (first.length !== second.length) {
@@ -149,7 +150,7 @@ function LimitOrder() {
       // console.log("parsedCurrentPrice: ", parsedCurrentPrice);
 
       if (parsedCurrentPrice && parsedLimitPrice?.lessThan(parsedCurrentPrice)) {
-        console.log("This transaction is below market rate");
+        console.log('This transaction is below market rate')
         setCurrencyInputPanelError(i18n._(t`This transaction is below market rate`))
       } else {
         setCurrencyInputPanelError('')
@@ -218,11 +219,8 @@ function LimitOrder() {
   return (
     <Container id="limit-order-page" className="py-4 space-y-6 md:py-8 lg:py-12" maxWidth="2xl">
       <Head>
-        <title>{i18n._(t`Limit order`)} | Tango</title>
-        <meta
-          name="description"
-          content="TANGOswap allows for swapping of SEP20 compatible tokens"
-        />
+        <title>{i18n._(t`Limit order`)} | Orders.Cash</title>
+        <meta name="description" content="TANGOswap allows for swapping of SEP20 compatible tokens" />
       </Head>
       <TokenWarningModal
         isOpen={importTokensNotInDefault.length > 0 && !dismissTokenWarning}
@@ -346,6 +344,13 @@ function LimitOrder() {
           </div>
         </DoubleGlowShadow>
       </ExpertModePanel>
+
+      <div className="text-center flex items-center absolute bottom-20 lg:bottom-2 right-2">
+        <div className="relative h-24 w-28">
+          <Image layout="fill" objectFit="contain" src="/orderscash.png" alt="Orders.Cash" />
+        </div>
+      </div>
+
     </Container>
   )
 }

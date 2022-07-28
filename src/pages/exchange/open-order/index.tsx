@@ -24,7 +24,7 @@ function OpenOrdersPage() {
   return (
     <Container id="open-order-page" className="py-4 md:py-8 lg:py-12" maxWidth="2xl">
       <Head>
-        <title>Open Orders | Tango</title>
+        <title>Open Orders | Orders.Cash</title>
         <meta name="description" content="Open orders..." />
       </Head>
       <div className="min-w-0 md:min-w-[672px]">
@@ -57,10 +57,10 @@ function OpenOrdersPage() {
     </Container>
   )
   */
-   return (
-     <Container id="open-order-page" className="py-4 md:py-8 lg:py-12" maxWidth="2xl">
-     </Container>
-   )
+  return (
+    <Container id="open-order-page" className="py-4 md:py-8 lg:py-12" maxWidth="2xl">
+    </Container>
+  )
 }
 
 export default OpenOrdersPage

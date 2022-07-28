@@ -56,7 +56,7 @@ export const BLOCKED_ADDRESSES: string[] = [
 ]
 
 export const ANALYTICS_URL: { [chainId in ChainId]?: string } = {
-  // [ChainId.SMARTBCH]: 'https://analytics.tangoswap.cash',
+  // [ChainId.SMARTBCH]: 'https://analytics.orders.cash',
 }
 
 export const LNS_METADATA_URL: { [chainId in ChainId]?: string } = {

@@ -1,12 +1,4 @@
-import {
-  ChainId,
-  Currency,
-  CurrencyAmount,
-  JSBI,
-  Token,
-  TradeType,
-  Trade as V2Trade,
-} from '@tangoswapcash/sdk'
+import { ChainId, Currency, CurrencyAmount, JSBI, Token, TradeType, Trade as V2Trade } from '@tangoswapcash/sdk'
 import { ApprovalState, useApproveCallbackFromTrade } from '../../../hooks/useApproveCallback'
 import { ArrowWrapper, BottomGrouping, SwapCallbackError } from '../../../features/exchange-v1/swap/styleds'
 import { ButtonConfirmed, ButtonError } from '../../../components/Button'
@@ -300,8 +292,7 @@ export default function Swap() {
           action: 'Swap',
           name: txHash,
           value: null,
-        });
-
+        })
       })
       .catch((error) => {
         setSwapState({
@@ -424,27 +415,23 @@ export default function Swap() {
 
   const [refreshingPrice, setRefreshingPrice] = useState(false)
   const refreshPrice = () => {
-      if(formattedAmounts[Field.INPUT] || formattedAmounts[Field.OUTPUT]){
-        setRefreshingPrice(true)
-        setTimeout(() => {
-          independentField === Field.INPUT
+    if (formattedAmounts[Field.INPUT] || formattedAmounts[Field.OUTPUT]) {
+      setRefreshingPrice(true)
+      setTimeout(() => {
+        independentField === Field.INPUT
           ? handleTypeInput(formattedAmounts[Field.INPUT])
           : handleTypeOutput(formattedAmounts[Field.OUTPUT])
-          setRefreshingPrice(false)
-        }, 700);
-      }
+        setRefreshingPrice(false)
+      }, 700)
+    }
   }
 
   return (
     <Container id="swap-page" className="py-4 md:py-8 lg:py-12">
       <Head>
-        <title>{i18n._(t`TANGOswap`)} | TANGOswap</title>
-        {/* <title>{GetRateText({price: trade?.executionPrice, showInverted}) || i18n._(t`TANGOswap`)} | TANGOswap</title> */}
-        <meta
-          key="description"
-          name="description"
-          content="TANGOswap allows for swapping of SEP20 compatible tokens"
-        />
+        <title>{i18n._(t`TANGOswap`)} | Orders.Cashswap</title>
+        {/* <title>{GetRateText({price: trade?.executionPrice, showInverted}) || i18n._(t`TANGOswap`)} | Orders.Cashswap</title> */}
+        <meta key="description" name="description" content="TANGOswap allows for swapping of SEP20 compatible tokens" />
       </Head>
       <TokenWarningModal
         isOpen={importTokensNotInDefault.length > 0 && !dismissTokenWarning}
@@ -475,7 +462,7 @@ export default function Swap() {
             onDismiss={handleConfirmDismiss}
             minerBribe={doArcher ? archerETHTip : undefined}
           />
-          <div className={refreshingPrice ? "opacity-40 pointer-events-none" : undefined}>
+          <div className={refreshingPrice ? 'opacity-40 pointer-events-none' : undefined}>
             <CurrencyInputPanel
               // priceImpact={priceImpact}
               label={
@@ -486,7 +473,7 @@ export default function Swap() {
               currency={currencies[Field.INPUT]}
               onUserInput={handleTypeInput}
               onMax={handleMaxInput}
-              fiatValue={/*fiatValueInput ?? */undefined}
+              fiatValue={/*fiatValueInput ?? */ undefined}
               onCurrencySelect={handleInputSelect}
               otherCurrency={currencies[Field.OUTPUT]}
               showCommonBases={true}
@@ -544,7 +531,7 @@ export default function Swap() {
                 label={independentField === Field.INPUT && !showWrap ? i18n._(t`Swap To (est.):`) : i18n._(t`Swap To:`)}
                 showMaxButton={false}
                 hideBalance={false}
-                fiatValue={/*fiatValueOutput ?? */undefined}
+                fiatValue={/*fiatValueOutput ?? */ undefined}
                 //priceImpact={priceImpact}
                 currency={currencies[Field.OUTPUT]}
                 onCurrencySelect={handleOutputSelect}

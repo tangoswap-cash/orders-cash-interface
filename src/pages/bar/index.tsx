@@ -57,7 +57,7 @@ const buttonStyleDisabled = `${buttonStyle} text-secondary bg-dark-700`
 const buttonStyleConnectWallet = `${buttonStyle} text-high-emphesis bg-cyan-blue hover:bg-opacity-90`
 
 // TODO(tango): change this
-// const fetcher = (query) => request('https://thegraph.tangoswap.cash/subgraphs/name/tangoswap/bar', query)
+// const fetcher = (query) => request('https://thegraph.orders.cash/subgraphs/name/tangoswap/bar', query)
 
 export default function Stake() {
   const { i18n } = useLingui()
@@ -72,7 +72,7 @@ export default function Stake() {
   // TODO(tango): change this
   // // const { data } = useSWR(`{bar(id: "${XTANGO[chainId].address}") {ratio, totalSupply}}`, fetcher)
   // const { data } = useSWR(`{bar(id: "0xc41c680c60309d4646379ed62020c534eb67b6f4") {ratio, totalSupply}}`, fetcher)
-  const data = null;
+  const data = null
 
   const xSushiPerSushi = parseFloat(data?.bar?.ratio)
 
@@ -165,7 +165,7 @@ export default function Stake() {
   return (
     <Container id="bar-page" className="py-4 md:py-8 lg:py-12" maxWidth="full">
       <Head>
-        <title key="title">Stake | Tango</title>
+        <title key="title">Stake | Orders.Cash</title>
         <meta
           key="description"
           name="description"
@@ -258,7 +258,7 @@ export default function Stake() {
                   </div>
                 </div>
                 <div className="flex flex-col"> */}
-                  {/*
+            {/*
                   <p className="mb-1 text-lg font-bold text-right text-high-emphesis md:text-3xl">
                     {`${apr ? apr.toFixed(2) + '%' : i18n._(t`Loading...`)}`}
                   </p>
@@ -266,7 +266,7 @@ export default function Stake() {
                     {i18n._(t`Yesterday's APR`)}
                   </p>
                   */}
-                {/* </div>
+            {/* </div>
               </div>
               }
             </div> */}
@@ -418,11 +418,18 @@ export default function Stake() {
                       <p className="text-sm md:text-base text-primary">xTANGO</p>
                     </div>
                   </div>
-                  {(xTangoBalance && xSushiPerSushi) ?
-                    (<div className="mt-3">
-                      ~ {xTangoBalance.multiply(Math.round(xSushiPerSushi * 1e8)).divide(1e8).toSignificant(8)} TANGO
-                    </div>) : (<></>)
-                  }
+                  {xTangoBalance && xSushiPerSushi ? (
+                    <div className="mt-3">
+                      ~{' '}
+                      {xTangoBalance
+                        .multiply(Math.round(xSushiPerSushi * 1e8))
+                        .divide(1e8)
+                        .toSignificant(8)}{' '}
+                      TANGO
+                    </div>
+                  ) : (
+                    <></>
+                  )}
                 </div>
 
                 <div className="flex flex-col flex-grow">

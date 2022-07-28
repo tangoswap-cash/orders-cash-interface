@@ -28,7 +28,7 @@ module.exports = {
           r: 'to right',
         },
         colors: {
-          'blue-pink': ['#651906', '#BB5E41'],
+          'blue-pink': ['#4d6027', '#a3fd4b'],
           'pink-red-light-brown': ['#FE5A75', '#FEC464'],
         },
         background: {
@@ -45,15 +45,15 @@ module.exports = {
         },
       },
       colors: {
-        purple: '#8D0000',
-        blue: '#651906',
-        pink: '#BB5E41',
+        purple: '#a3fd4b',  // original purple, pink esta copiado de aca, deberia cambiar pink y similares
+        blue: '#4d6027',    // copiado de dark-700, deberia cambiar blue en todos lados
+        pink: '#a3fd4b',
         green: '#7cff6b',
         red: '#ff3838',
         yellow: '#ffd166',
 
         'opaque-blue': '#84000080',
-        'opaque-pink': '#BB5E4180',
+        'opaque-pink': '#a3fd4b80',
         'pink-red': '#FE5A75',
         'light-brown': '#FEC464',
         'light-yellow': '#FFD166',
@@ -61,10 +61,10 @@ module.exports = {
         'dark-pink': '#221825',
         'dark-blue': '#0F182A',
         'dark-1000': '#0f0808',
-        'dark-900': '#201111',
+        'dark-900': '#1a210d',
         'dark-850': '#1d1e2c',
-        'dark-800': '#312020',
-        'dark-700': '#4a3030',
+        'dark-800': '#2f3b18',
+        'dark-700': '#4d6027',
         'dark-600': '#1C2D49',
         'dark-500': '#223D5E',
         'low-emphesis': '#575757',
@@ -161,8 +161,7 @@ module.exports = {
     plugin(function ({ addUtilities }) {
       addUtilities({
         '.header-border-b': {
-          background:
-            'linear-gradient(to right, #651906 0%, #BB5E41 100%) left bottom no-repeat',
+          background: 'linear-gradient(to right, #4d6027 0%, #a3fd4b 100%) left bottom no-repeat',
           backgroundSize: '100% 1px',
         },
       })
