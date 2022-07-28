@@ -54,10 +54,10 @@ const nextConfig = {
         source: '/',
         destination: '/exchange/limit-order',
       },
-      {
-        source: '/:token*',
-        destination: '/exchange/limit-order/:token*',
-      },
+      // {
+      //   source: '/:token*',
+      //   destination: '/exchange/limit-order/:token*',
+      // },
       {
         source: '/limit-order',
         destination: '/exchange/limit-order',
@@ -65,6 +65,26 @@ const nextConfig = {
       {
         source: '/limit-order/:token*',
         destination: '/exchange/limit-order/:token*',
+      },
+      {
+        source: '/take-order',
+        has: [{ type: 'query', key: 'o', value: '(?<override>.*)' }],
+        destination: '/exchange/take-order?o=:override',
+      },
+      {
+        source: '/exchange/take-order',
+        has: [{ type: 'query', key: 'o', value: '(?<override>.*)' }],
+        destination: '/exchange/take-order?o=:override',
+      },
+      {
+        source: '/take',
+        has: [{ type: 'query', key: 'o', value: '(?<override>.*)' }],
+        destination: '/exchange/take-order?o=:override',
+      },
+      {
+        source: '/exchange/take',
+        has: [{ type: 'query', key: 'o', value: '(?<override>.*)' }],
+        destination: '/exchange/take-order?o=:override',
       },
     ]
   },

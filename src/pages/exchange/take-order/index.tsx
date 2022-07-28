@@ -289,7 +289,7 @@ function TakeOrderPage() {
   )
 
   const makerAddress = useGetSigner(order.coinsToMaker, order.coinsToTaker, dueTime80_v8_version8, order.r, order.s)
-  console.log('makerAddress: ', makerAddress)
+  // console.log('makerAddress: ', makerAddress)
 
   const handleSwap = useCallback(() => {
     if (!swapCallback) {
