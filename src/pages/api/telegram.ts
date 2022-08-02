@@ -8,14 +8,7 @@ const handler = async (req, res) => {
   }
 
   // const url = new URL(req.url, `http://${req.getHeaders().host}`)
-  // const url = new URL(req.url, `http://localhost:3000`)
   const url = new URL(req.url, `https://orders.cash`)
-
-  // console.log("url: ", url)
-  // console.log("url.searchParams: ", url.searchParams)
-  // console.log("url.searchParams param1: ", url.searchParams.get('param1'))
-  // console.log("url.searchParams param2: ", url.searchParams.get('param2'))
-
   const orderUrl = url.searchParams.get('url')
   const endTime = url.searchParams.get('endTime')
   const fromToken = url.searchParams.get('fromToken')

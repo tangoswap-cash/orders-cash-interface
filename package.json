@@ -164,7 +164,14 @@
     "not op_mini all"
   ],
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^6.1.2",
+    "@fortawesome/free-brands-svg-icons": "^6.1.2",
+    "@fortawesome/free-solid-svg-icons": "^6.1.2",
+    "@fortawesome/react-fontawesome": "^0.2.0",
+    "axios": "^0.27.2",
     "bchaddrjs": "^0.5.2",
+    "boxicons": "^2.1.2",
+    "dotenv": "^16.0.1",
     "mainnet-js": "^0.4.34",
     "moment": "^2.29.1",
     "patch-package": "^6.4.7",
