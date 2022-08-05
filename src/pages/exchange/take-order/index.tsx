@@ -416,7 +416,7 @@ function TakeOrderPage() {
                 {/* <div className="text-sm text-low-emphesis">≈ {inputValueUSDC} USDC</div> */}
               </div>
             </div>
-            <div className="flex justify-between px-5 py-3 rounded bg-dark-800">
+            <div className="flex justify-between px-5 py-3 rounded bg-dark-800 items-center">
               <span className="font-bold text-secondary">{i18n._(t`Rate`)}</span>
               <span className="text-primary">
                 <PriceRatio2 currentPrice={limitPrice} currencies={currencies} parsedAmounts={parsedAmounts} />
