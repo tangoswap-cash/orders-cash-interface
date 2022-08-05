@@ -3,7 +3,7 @@ import { useBlockNumber } from '../../../state/application/hooks'
 import Button from '../../../components/Button'
 import { ButtonConfirmed, ButtonError } from '../../../components/Button'
 import Alert from '../../../components/Alert'
-import { ArrowLeftIcon } from '@heroicons/react/solid'
+import { ArrowLeftIcon, ClipboardCheckIcon, ClipboardCopyIcon } from '@heroicons/react/solid'
 import { ChainId, Price } from '@tangoswapcash/sdk'
 import Container from '../../../components/Container'
 import DoubleGlowShadow from '../../../components/DoubleGlowShadow'
@@ -43,6 +43,8 @@ import { useLimitOrderCallback } from '../../../hooks/useLimitOrderCallback'
 import { useCurrencyBalances } from '../../../state/wallet/hooks'
 import { useMemo } from 'react'
 import { useSingleCallResult } from '../../../state/multicall/hooks'
+import useCopyClipboard from '../../../hooks/useCopyClipboard'
+import Typography from '../../../components/Typography'
 
 function b64ToUint6(nChr) {
   return nChr > 64 && nChr < 91
@@ -165,6 +167,7 @@ function TakeOrderPage() {
   const { oParam } = useDefaultsFromURLSearch()
   const u8arr = base64DecToArr(oParam, undefined)
   const toggleWalletModal = useWalletModalToggle()
+  const [isCopied, setCopied] = useCopyClipboard(10000)
 
   const CoinTypeToMakerStart = 1
   const AmountToMakerStart = 1 + 20
@@ -394,6 +397,12 @@ function TakeOrderPage() {
     )
   }
 
+  let buttonCoppy = isCopied ? 
+    <ClipboardCheckIcon width={16} height={16} onClick={() => setCopied(makerAddress)} className="cursor-pointer ml-1"/> : 
+    <ClipboardCopyIcon width={16} height={16} onClick={() => setCopied(makerAddress)} className="cursor-pointer ml-1"/>
+
+  let sufficientAmount = false; // <------ TODO get balance maker 
+
   return (
     <Container id="take-order-page" className="py-4 md:py-8 lg:py-12" maxWidth="lg">
       <Head>
@@ -441,6 +450,32 @@ function TakeOrderPage() {
           <div className="flex justify-between px-5 py-3 rounded bg-dark-800">
             <span className="font-bold text-secondary">{i18n._(t`Order Expiration`)}</span>
             <span className="text-primary">{formatDateTime(dueTime) + ' ' + expiration}</span>
+          </div>
+
+          <div className='flex flex-col rounded bg-dark-800'>
+            <div className="flex justify-between px-5 py-1 items-center">
+              <span className="font-bold text-secondary">{i18n._(t`Maker address`)}</span>
+              <div className="flex items-center">
+                {
+                  makerAddress ? 
+                    <Typography variant="sm" className="flex text-primary truncate">
+                      {makerAddress.substring(0, 23) + '...'} {buttonCoppy}
+                    </Typography> : 
+                    <Dots><span/></Dots>
+                }
+              </div>
+            </div>
+            <div className="flex justify-between px-5 py-1">
+              <span className="font-bold text-secondary">{i18n._(t`Order status`)}</span>
+              <span className="text-primary ">
+                {makerAddress ? 
+                  sufficientAmount ?
+                    i18n._(t`Sufficient amount`) 
+                   : i18n._(t`Maker's Balance Is Not Enough`)
+                   : <Dots><span/></Dots>
+                }
+              </span>
+            </div>
           </div>
 
           {button}
