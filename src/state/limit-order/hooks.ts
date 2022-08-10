@@ -432,7 +432,7 @@ export function queryParametersToSwapState(chainId: ChainId, parsedQs: ParsedQs)
     recipient: validatedRecipient(parsedQs.recipient),
     limitPrice: parseTokenAmountURLParameter(parsedQs.exactRate),
     fromBentoBalance: parseBooleanFieldParameter(parsedQs.fromBento),
-    orderExpiration: { value: OrderExpiration.day, label: i18n._(t`24 Hours`) },
+    orderExpiration: { value: OrderExpiration.week, label: i18n._(t`1 Week`) },
   }
 }
 
