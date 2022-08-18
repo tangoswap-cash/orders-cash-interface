@@ -283,8 +283,6 @@ export function useLimitOrderInfoSmartSwap(): {
   const rate = trade?.executionPrice
   console.log(rate?.toSignificant(6));
 
-  console.log(trade?.outputAmount?.toSignificant(6))
-
   const bentoBoxBalances = useBentoBalances()
   const balance = useMemo(
     () => bentoBoxBalances?.find((el) => el.address === inputCurrency?.wrapped.address),

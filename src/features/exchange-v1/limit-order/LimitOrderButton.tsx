@@ -36,6 +36,7 @@ import { faTelegram } from '@fortawesome/free-brands-svg-icons';
 import axios from 'axios'
 import { faCheck } from '@fortawesome/free-solid-svg-icons'
 import CashAddressInput from '../../../components/Input/Cashaddress'
+import useGetOrdersLocal from '../../../hooks/useGetOrdersLocal'
 
 interface LimitOrderButtonProps extends ButtonProps {
   currency: Currency
@@ -90,13 +91,14 @@ const LimitOrderButton: FC<LimitOrderButtonProps> = ({ currency, color, ...rest 
   const dispatch = useDispatch<AppDispatch>()
   const addPopup = useAddPopup()
   const toggleWalletModal = useWalletModalToggle()
-
   const [openConfirmationModal, setOpenConfirmationModal] = useState(false)
   const [takeOrderURL, setTakeOrderURL] = useState<string>(null)
 
   const [isCopied, setCopied] = useCopyClipboard(10000)
   const [clicked, wasClicked] = useState(false)
   const [endTimeState, setEndTimeState] = useState<string>(null)
+
+  const [orders, setOrders] = useState(useGetOrdersLocal());
 
   const { orderExpiration, recipient } = useLimitOrderState()
   const { parsedAmounts, inputError } = useDerivedLimitOrderInfo()
@@ -115,6 +117,12 @@ const LimitOrderButton: FC<LimitOrderButtonProps> = ({ currency, color, ...rest 
     (tokenApprovalState === ApprovalState.NOT_APPROVED || tokenApprovalState === ApprovalState.PENDING)
 
   const disabled = !!inputError || tokenApprovalState === ApprovalState.PENDING
+
+  const postOrderLocal = (newOrder) => {
+    console.log('antes: ', orders)
+    console.log('Pal local: ', {loading: false, orders: [...orders.orders, newOrder]})
+    localStorage.setItem('orders', JSON.stringify(orders.orders))
+  }
 
   const handler = useCallback(async () => {
     const signer = library.getSigner()
@@ -188,6 +196,14 @@ const LimitOrderButton: FC<LimitOrderButtonProps> = ({ currency, color, ...rest 
     }
 
     try {
+
+      let openOrderToLocalStorage = {
+        account,
+        input: {value: parsedAmounts[Field.INPUT]?.toSignificant(6), currency: parsedAmounts?.INPUT?.currency},
+        output: {value: parsedAmounts[Field.OUTPUT]?.toSignificant(6), currency: parsedAmounts?.OUTPUT?.currency},
+        orderExpiration: orderExpiration.label,
+      }
+
       const sig = await signer._signTypedData(Domain, Types, msg)
       // o=ver8,coinsToMaker256,coinsToTaker256,dueTime80,r256,s256,v8
       const order = '01'
@@ -197,19 +213,19 @@ const LimitOrderButton: FC<LimitOrderButtonProps> = ({ currency, color, ...rest 
         + sig.substr(2)
 
       const url = 'https://orders.cash/take?o=' + base64EncArr(hexToArr(order))
-      console.log('url: ', url)
+
       setTakeOrderURL(url)
-
       setOpenConfirmationModal(false)
-
+      
       if (true) {
+        console.log('openOrderToLocalStorage: ',openOrderToLocalStorage)
+        postOrderLocal(openOrderToLocalStorage)
         addPopup({
           txn: { hash: null, summary: 'Limit order created', success: true },
         })
         await mutate()
       }
     } catch (e) {
-      console.log('error: ', e)
       addPopup({
         txn: {
           hash: null,
@@ -337,7 +353,6 @@ const LimitOrderButton: FC<LimitOrderButtonProps> = ({ currency, color, ...rest 
           </Button>
         </div>
       }
-
       {button}
 
       <style jsx>{`
