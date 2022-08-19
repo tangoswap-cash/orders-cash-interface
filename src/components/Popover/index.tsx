@@ -21,7 +21,7 @@ export default function Popover({ content, show, children, placement = 'auto' }:
     placement,
     strategy: 'fixed',
     modifiers: [
-      { name: 'offset', options: { offset: [8, 8] } },
+      { name: 'offset', options: { offset: [0, 0] } },
       { name: 'arrow', options: { element: arrowElement } },
     ],
   })
@@ -31,13 +31,12 @@ export default function Popover({ content, show, children, placement = 'auto' }:
   useInterval(updateCallback, show ? 100 : null)
 
   return (
-    <HeadlessuiPopover>
+    <HeadlessuiPopover className="relative">
       <div ref={setReferenceElement as any}>{children}</div>
       <HeadlessuiPopover.Panel
-        static
-        className={classNames(!show && 'hidden opacity-0', 'z-50 animate-fade')}
+        static 
+        className={classNames(!show && 'hidden opacity-0', 'absolute z-50 animate-fade')}
         ref={setPopperElement as any}
-        style={styles.popper}
         {...attributes.popper}
       >
         {content}

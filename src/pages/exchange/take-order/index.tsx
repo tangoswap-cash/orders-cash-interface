@@ -43,6 +43,7 @@ import { useLimitOrderCallback } from '../../../hooks/useLimitOrderCallback'
 import { useCurrencyBalances } from '../../../state/wallet/hooks'
 import { useMemo } from 'react'
 import { useSingleCallResult } from '../../../state/multicall/hooks'
+import LabelTokenCurrency from '../../../components/LabelTokenCurrency'
 
 function b64ToUint6(nChr) {
   return nChr > 64 && nChr < 91
@@ -406,15 +407,11 @@ function TakeOrderPage() {
           <div className="flex flex-col gap-6">
             <div className="flex flex-col gap-3">
               <div className="text-xl font-bold text-white">{i18n._(t`You pay:`)}</div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <CurrencyLogo size={40} currency={inputCurrency} />
-
-                  <div className="text-xl font-bold text-white">{parsedInputAmount?.toSignificant(6)}</div>
-                  <div className="text-xl text-white">{inputCurrency?.symbol}</div>
-                </div>
-                {/* <div className="text-sm text-low-emphesis">≈ {inputValueUSDC} USDC</div> */}
-              </div>
+              <LabelTokenCurrency 
+                currency={inputCurrency} 
+                parsedAmount={parsedInputAmount?.toSignificant(6)} 
+                tokenAddress={inputCurrency?.wrapped?.address}
+              />
             </div>
             <div className="flex justify-between px-5 py-3 rounded bg-dark-800">
               <span className="font-bold text-secondary">{i18n._(t`Rate`)}</span>
@@ -424,20 +421,13 @@ function TakeOrderPage() {
             </div>
             <div className="flex flex-col gap-3">
               <div className="flex gap-2 text-xl font-bold text-white">{i18n._(t`You receive:`)}</div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  {/* <CurrencyLogo size={40} currency={currencies[Field.OUTPUT]} />
-                  <div className="text-xl font-bold text-white">{parsedAmounts[Field.OUTPUT]?.toSignificant(6)}</div>
-                  <div className="text-xl text-white">{currencies[Field.OUTPUT]?.symbol}</div> */}
-                  <CurrencyLogo size={40} currency={outputCurrency} />
-                  <div className="text-xl font-bold text-white">{parsedOutputAmount?.toSignificant(6)}</div>
-                  <div className="text-xl text-white">{outputCurrency?.symbol}</div>
-                </div>
-                {/* <div className="text-sm text-low-emphesis">≈ {outputValueUSDC} USDC</div> */}
-              </div>
+              <LabelTokenCurrency
+                currency={outputCurrency}
+                parsedAmount={parsedOutputAmount?.toSignificant(6)} 
+                tokenAddress={outputCurrency?.wrapped?.address}
+               />
             </div>
           </div>
-
           <div className="flex justify-between px-5 py-3 rounded bg-dark-800">
             <span className="font-bold text-secondary">{i18n._(t`Order Expiration`)}</span>
             <span className="text-primary">{formatDateTime(dueTime) + ' ' + expiration}</span>
