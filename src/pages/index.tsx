@@ -5,7 +5,7 @@ import LimitOrder from './exchange/limit-order/[[...tokens]]'
 import OpenOrdersPage from './exchange/open-order'
 
 export default function Dashboard() {
-   return LimitOrder()
+   return OpenOrdersPage()
   // return (
   //   <Container id="dashboard-page" className="py-4 md:py-8 lg:py-12" maxWidth="2xl">
   //     <Head>

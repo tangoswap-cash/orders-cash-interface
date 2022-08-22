@@ -10,7 +10,7 @@ import Pagination from './Pagination'
 import TransactionConfirmationModal from '../../../modals/TransactionConfirmationModal'
 import loadingCircle from '../../../animation/loading-circle.json'
 import { t } from '@lingui/macro'
-import { useLimitOrderContract } from '../../../hooks'
+import { useActiveWeb3React, useLimitOrderContract } from '../../../hooks'
 import useLimitOrders from '../../../hooks/useLimitOrders'
 import { useLingui } from '@lingui/react'
 import { useTransactionAdder } from '../../../state/transactions/hooks'
@@ -18,9 +18,6 @@ import useGetOrdersLocal from '../../../hooks/useGetOrdersLocal'
 
 const OpenOrders: FC = () => {
   const { i18n } = useLingui()
-  //const { pending, mutate } = useLimitOrders()
-  //const limitOrderContract = useLimitOrderContract(true)
-  //const addTransaction = useTransactionAdder()
   const orders = useGetOrdersLocal()
   const [hash, setHash] = useState('')
 
@@ -36,8 +33,8 @@ const OpenOrders: FC = () => {
   //   await mutate((data) => ({ ...data }))
   // }
 
-  const cancelOrder = () => {
-    console.log('canceladisima')
+  const cancelOrder = (order) => {
+    console.log('TODO cancel order', order) //TODO cancel Order
   }
 
   return (
@@ -54,16 +51,17 @@ const OpenOrders: FC = () => {
         {i18n._(t`Open Orders`)}{' '}
         <span className="inline-flex">
           <Badge color="blue" size="medium">
-            {orders?.openOrders?.length}
+            {orders?.length}
           </Badge>
         </span>
       </div>
       <div className="text-center text-secondary">
-        {orders.loading ? (
+        {/* {orders.loading ? (
           <div className="w-8 m-auto">
             <Lottie animationData={loadingCircle} autoplay loop />
           </div>
-        ) : orders?.openOrders?.length > 0 ? (
+        ) :  */}
+        {orders?.length > 0 ? (
           <>
             <div className="grid grid-flow-col grid-cols-3 gap-4 px-4 pb-4 text-sm font-bold md:grid-cols-4 text-secondary">
               <div className="flex items-center cursor-pointer hover:text-primary">{i18n._(t`Receive`)}</div>
@@ -74,42 +72,45 @@ const OpenOrders: FC = () => {
               <div className="flex items-center justify-end cursor-pointer hover:text-primary" />
             </div>
             <div className="flex flex-col gap-2 md:gap-5">
-              {orders?.openOrders?.map((order, index) => (
+              {orders?.map((order, index) => (
                 <div key={index} className="block overflow-hidden rounded text-high-emphesis bg-dark-800">
                   <div className="grid items-center grid-flow-col grid-cols-3 gap-4 px-4 py-3 text-sm md:grid-cols-4 align-center text-primary">
                     <div className="flex flex-col">
                       <div className="flex items-center gap-4 font-bold">
                         <div className="min-w-[32px] flex items-center">
-                          <CurrencyLogo size={32} currency={order.tokenOut} />
+                          <CurrencyLogo size={32} currency={order.output.currency} />
                         </div>
                         <div className="flex flex-col">
-                          <div>{order.limitOrder.amountOut.toSignificant(6)} </div>
-                          <div className="text-xs text-left text-secondary">{order.tokenOut.symbol}</div>
+                          <div>{order.output.value}</div>
+                          <div className="text-xs text-left text-secondary">{order.output.currency.symbol}</div>
                         </div>
                       </div>
                     </div>
-                    <div className="font-bold text-left">
+                    <div className="flex items-center gap-4 font-bold text-left">
+                      <div className="min-w-[32px] flex items-center">
+                          <CurrencyLogo size={32} currency={order.input.currency} />
+                        </div>
                       <div className="flex flex-col">
-                        <div>{order.limitOrder.amountIn.toSignificant(6)} </div>
-                        <div className="text-xs text-left text-secondary">{order.tokenIn.symbol}</div>
+                        <div>{order.input.value}</div>
+                        <div className="text-xs text-left text-secondary">{order.input.currency.symbol}</div>
                       </div>
                     </div>
                     <div className="hidden font-bold text-left md:block">
                       <div>{order.rate}</div>
                       <div className="text-xs text-secondary">
-                        {order.tokenOut.symbol} per {order.tokenIn.symbol}
+                      {order.output.currency.symbol ? order.output.currency.symbol : order.output.currency.tokenInfo.symbol} per {order.input.currency.symbol}
                       </div>
                     </div>
                     <div className="font-bold text-right">
-                      <div className="mb-1">
+                      {/* <div className="mb-1">
                         {order.filledPercent}% {i18n._(t`Filled`)}
-                      </div>
+                      </div> */}
                       <div>
                         <Button
                           color="pink"
                           variant="outlined"
                           size="xs"
-                          onClick={() => cancelOrder()}
+                          onClick={() => cancelOrder(order)}
                         >
                           {i18n._(t`Cancel Order`)}
                         </Button>

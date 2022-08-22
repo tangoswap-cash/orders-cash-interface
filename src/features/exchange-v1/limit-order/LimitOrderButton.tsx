@@ -101,7 +101,7 @@ const LimitOrderButton: FC<LimitOrderButtonProps> = ({ currency, color, ...rest 
   const [orders, setOrders] = useState(useGetOrdersLocal());
 
   const { orderExpiration, recipient } = useLimitOrderState()
-  const { parsedAmounts, inputError } = useDerivedLimitOrderInfo()
+  const { parsedAmounts, inputError, currencies } = useDerivedLimitOrderInfo()
 
   const { mutate } = useLimitOrders()
 
@@ -120,9 +120,21 @@ const LimitOrderButton: FC<LimitOrderButtonProps> = ({ currency, color, ...rest 
 
   const postOrderLocal = (newOrder) => {
     console.log('antes: ', orders)
-    console.log('Pal local: ', {loading: false, orders: [...orders.orders, newOrder]})
-    localStorage.setItem('orders', JSON.stringify(orders.orders))
+    console.log('Pal local: ', {loading: false, orders: [...orders, newOrder]})
+    localStorage.setItem('orders', JSON.stringify([...orders, newOrder]))
   }
+
+  let outputValue = parsedAmounts[Field.OUTPUT]?.toSignificant(6)
+  let inputValue = parsedAmounts[Field.INPUT]?.toSignificant(6)
+  let openOrderToLocalStorage = {
+    id: Date.now(),
+    account,
+    input: {value: inputValue, currency: {...currencies[Field.INPUT], address: currencies[Field.INPUT]?.wrapped.address}},
+    output: {value: outputValue, currency: currencies[Field.OUTPUT]?.tokenInfo ? currencies[Field.OUTPUT]?.tokenInfo : currencies[Field.OUTPUT]},
+    orderExpiration: orderExpiration.label,
+    rate: Number((parseFloat(outputValue) / parseFloat(inputValue))?.toFixed(2))
+  }
+  console.log('openOrderToLocalStorage: ', openOrderToLocalStorage)
 
   const handler = useCallback(async () => {
     const signer = library.getSigner()
@@ -196,12 +208,15 @@ const LimitOrderButton: FC<LimitOrderButtonProps> = ({ currency, color, ...rest 
     }
 
     try {
-
+      let outputValue = parsedAmounts[Field.OUTPUT]?.toSignificant(6)
+      let inputValue = parsedAmounts[Field.INPUT]?.toSignificant(6)
       let openOrderToLocalStorage = {
+        id: Date.now(),
         account,
-        input: {value: parsedAmounts[Field.INPUT]?.toSignificant(6), currency: parsedAmounts?.INPUT?.currency},
-        output: {value: parsedAmounts[Field.OUTPUT]?.toSignificant(6), currency: parsedAmounts?.OUTPUT?.currency},
+        input: {value: inputValue, currency: {...currencies[Field.INPUT], address: currencies[Field.INPUT]?.wrapped.address}},
+        output: {value: outputValue, currency: currencies[Field.OUTPUT]?.tokenInfo ? currencies[Field.OUTPUT]?.tokenInfo : currencies[Field.OUTPUT]},
         orderExpiration: orderExpiration.label,
+        rate: Number((parseFloat(outputValue) / parseFloat(inputValue))?.toFixed(2))
       }
 
       const sig = await signer._signTypedData(Domain, Types, msg)

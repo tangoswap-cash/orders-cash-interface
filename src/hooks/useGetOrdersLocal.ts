@@ -1,15 +1,14 @@
 import { useEffect, useRef, useState } from 'react'
 
 export default function useGetOrdersLocal() {
-  const orders = useRef({orders: []});
+  const orders = useRef([]);
 
   useEffect(() => {
     let storageOrders = localStorage.getItem('orders');
-    console.log('storageOrders: ', storageOrders)
     if(storageOrders){
-      orders.current = {...JSON.parse(storageOrders)}
+      orders.current = [...JSON.parse(storageOrders)]
     }else{
-      orders.current = {orders: []}
+      orders.current = []
     }
   }, [])
 
