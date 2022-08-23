@@ -10,14 +10,15 @@ import Head from 'next/head'
 import NavLink from '../../../components/NavLink'
 import NetworkGuard from '../../../guards/Network'
 import OpenOrders from '../../../features/exchange-v1/open-order/OpenOrders'
-import React from 'react'
+import React, { useState } from 'react'
 import { t } from '@lingui/macro'
 import useLimitOrders from '../../../hooks/useLimitOrders'
 import { useLingui } from '@lingui/react'
 import { useLimitOrderApproveCallback } from '../../../hooks/useLimitOrderApproveCallback'
+import useGetOrdersLocal from '../../../hooks/useGetOrdersLocal'
 
 function OpenOrdersPage() {
-  
+  const [orders, setOrders] = useState(useGetOrdersLocal())
   const { i18n } = useLingui()
   const { pending } = useLimitOrders()
 
@@ -49,8 +50,8 @@ function OpenOrdersPage() {
         )}
         <DoubleGlowShadow>
           <div id="limit-order-page" className="flex flex-col w-full gap-4 p-3 rounded md:p-5 bg-dark-900">
-            <OpenOrders />
-            <CompletedOrders />
+            <OpenOrders orders={orders} setOrders={setOrders}/>
+            <CompletedOrders orders={orders} setOrders={setOrders}/>
           </div>
         </DoubleGlowShadow>
       </div>

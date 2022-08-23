@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react'
+import React, { FC, useEffect, useState } from 'react'
 
 import Badge from '../../../components/Badge'
 import Button from '../../../components/Button'
@@ -15,11 +15,21 @@ import useLimitOrders from '../../../hooks/useLimitOrders'
 import { useLingui } from '@lingui/react'
 import { useTransactionAdder } from '../../../state/transactions/hooks'
 import useGetOrdersLocal from '../../../hooks/useGetOrdersLocal'
+import RowOrderLimit from '../../../components/RowOrderLimit'
 
-const OpenOrders: FC = () => {
+const OpenOrders = ({orders, setOrders}) => {
   const { i18n } = useLingui()
-  const orders = useGetOrdersLocal()
   const [hash, setHash] = useState('')
+  const totalCompleted = orders.reduce((a,b) => b.status == 'open' ? a + 1 : a, 0)
+
+  const deleteOrderLocal = (id) => {
+    const ordersFilter = orders.map(or => or.id == id ? {...or, status: 'cancelled'} : or)
+    setOrders(ordersFilter)
+    localStorage.setItem('orders', JSON.stringify(ordersFilter))
+  }
+
+  useEffect(() => {
+  }, [orders])
 
   // const cancelOrder = async (limitOrder: LimitOrder, summary: string) => {
   //   const tx = await limitOrderContract.cancelOrder(limitOrder.getTypeHash())
@@ -51,7 +61,7 @@ const OpenOrders: FC = () => {
         {i18n._(t`Open Orders`)}{' '}
         <span className="inline-flex">
           <Badge color="blue" size="medium">
-            {orders?.length}
+            {totalCompleted}
           </Badge>
         </span>
       </div>
@@ -61,7 +71,7 @@ const OpenOrders: FC = () => {
             <Lottie animationData={loadingCircle} autoplay loop />
           </div>
         ) :  */}
-        {orders?.length > 0 ? (
+        {totalCompleted > 0 ? (
           <>
             <div className="grid grid-flow-col grid-cols-3 gap-4 px-4 pb-4 text-sm font-bold md:grid-cols-4 text-secondary">
               <div className="flex items-center cursor-pointer hover:text-primary">{i18n._(t`Receive`)}</div>
@@ -73,51 +83,8 @@ const OpenOrders: FC = () => {
             </div>
             <div className="flex flex-col gap-2 md:gap-5">
               {orders?.map((order, index) => (
-                <div key={index} className="block overflow-hidden rounded text-high-emphesis bg-dark-800">
-                  <div className="grid items-center grid-flow-col grid-cols-3 gap-4 px-4 py-3 text-sm md:grid-cols-4 align-center text-primary">
-                    <div className="flex flex-col">
-                      <div className="flex items-center gap-4 font-bold">
-                        <div className="min-w-[32px] flex items-center">
-                          <CurrencyLogo size={32} currency={order.output.currency} />
-                        </div>
-                        <div className="flex flex-col">
-                          <div>{order.output.value}</div>
-                          <div className="text-xs text-left text-secondary">{order.output.currency.symbol}</div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-4 font-bold text-left">
-                      <div className="min-w-[32px] flex items-center">
-                          <CurrencyLogo size={32} currency={order.input.currency} />
-                        </div>
-                      <div className="flex flex-col">
-                        <div>{order.input.value}</div>
-                        <div className="text-xs text-left text-secondary">{order.input.currency.symbol}</div>
-                      </div>
-                    </div>
-                    <div className="hidden font-bold text-left md:block">
-                      <div>{order.rate}</div>
-                      <div className="text-xs text-secondary">
-                      {order.output.currency.symbol ? order.output.currency.symbol : order.output.currency.tokenInfo.symbol} per {order.input.currency.symbol}
-                      </div>
-                    </div>
-                    <div className="font-bold text-right">
-                      {/* <div className="mb-1">
-                        {order.filledPercent}% {i18n._(t`Filled`)}
-                      </div> */}
-                      <div>
-                        <Button
-                          color="pink"
-                          variant="outlined"
-                          size="xs"
-                          onClick={() => cancelOrder(order)}
-                        >
-                          {i18n._(t`Cancel Order`)}
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                order && order?.status == 'open' &&
+                  <RowOrderLimit key={index} order={order} deleteOrderLocal={deleteOrderLocal}/>
               ))}
             </div>
             {/* <Pagination
