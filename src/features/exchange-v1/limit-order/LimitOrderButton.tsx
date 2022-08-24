@@ -37,6 +37,7 @@ import axios from 'axios'
 import { faCheck } from '@fortawesome/free-solid-svg-icons'
 import CashAddressInput from '../../../components/Input/Cashaddress'
 import useGetOrdersLocal from '../../../hooks/useGetOrdersLocal'
+import useGetlocalStorage from '../../../hooks/useGetLocalStorage'
 
 interface LimitOrderButtonProps extends ButtonProps {
   currency: Currency
@@ -97,7 +98,7 @@ const LimitOrderButton: FC<LimitOrderButtonProps> = ({ currency, color, ...rest 
   const [isCopied, setCopied] = useCopyClipboard(10000)
   const [clicked, wasClicked] = useState(false)
   const [endTimeState, setEndTimeState] = useState<string>(null)
-
+  const isBroadcast = useGetlocalStorage('broadcaster') ?? 'false'
   const orders = useGetOrdersLocal()
 
   const { orderExpiration, recipient } = useLimitOrderState()
@@ -109,6 +110,20 @@ const LimitOrderButton: FC<LimitOrderButtonProps> = ({ currency, color, ...rest 
     parsedAmounts[Field.INPUT],
     chainId && ORDERS_CASH_V1_ADDRESS[chainId]
   )
+
+  const telegramMessage = async () => {
+
+    const limitPrice = new Price(
+      parsedAmounts[Field.INPUT].currency,
+      parsedAmounts[Field.OUTPUT].currency,
+      parsedAmounts[Field.INPUT].quotient,
+      parsedAmounts[Field.OUTPUT].quotient
+    )
+
+    const ret = await axios.post(`https://orders.cash/api/telegram?url=${takeOrderURL}&endTime=${endTimeState}&fromToken=${parsedAmounts[Field.INPUT].currency.symbol}&fromAmount=${parsedAmounts[Field.INPUT].toSignificant(6)}&toToken=${parsedAmounts[Field.OUTPUT].currency.symbol}&toAmount=${parsedAmounts[Field.OUTPUT].toSignificant(6)}&price=${limitPrice.toSignificant(6)}&priceInvert=${limitPrice.invert().toSignificant(6)}`)
+    console.log("telegram post result: ", ret);
+    wasClicked(true)
+  }
 
   const showTokenApprove =
     chainId &&
@@ -220,7 +235,9 @@ const LimitOrderButton: FC<LimitOrderButtonProps> = ({ currency, color, ...rest 
       setOpenConfirmationModal(false)
       
       if (true) {
-        console.log('openOrderToLocalStorage: ',openOrderToLocalStorage)
+        if(isBroadcast == 'true'){
+          telegramMessage()
+        }
         postOrderLocal(openOrderToLocalStorage)
         addPopup({
           txn: { hash: null, summary: 'Limit order created', success: true },
@@ -259,21 +276,6 @@ const LimitOrderButton: FC<LimitOrderButtonProps> = ({ currency, color, ...rest 
       </ButtonError>
     </>
   )
-
-  const telegramMessage = async () => {
-
-    const limitPrice = new Price(
-      parsedAmounts[Field.INPUT].currency,
-      parsedAmounts[Field.OUTPUT].currency,
-      parsedAmounts[Field.INPUT].quotient,
-      parsedAmounts[Field.OUTPUT].quotient
-    )
-
-    const ret = await axios.post(`https://orders.cash/api/telegram?url=${takeOrderURL}&endTime=${endTimeState}&fromToken=${parsedAmounts[Field.INPUT].currency.symbol}&fromAmount=${parsedAmounts[Field.INPUT].toSignificant(6)}&toToken=${parsedAmounts[Field.OUTPUT].currency.symbol}&toAmount=${parsedAmounts[Field.OUTPUT].toSignificant(6)}&price=${limitPrice.toSignificant(6)}&priceInvert=${limitPrice.invert().toSignificant(6)}`)
-    console.log("telegram post result: ", ret);
-    wasClicked(true)
-  }
-
 
   if (!account)
     button = (
