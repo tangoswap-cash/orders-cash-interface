@@ -331,7 +331,7 @@ function LimitOrder() {
                       onClick={handleBroadcaster}
                       className='p-1'
                     >
-                      Broadcastear por Telegram
+                      {i18n._(t`Send to`)} Telegram
                     </Button>
               )}
               {isExpertMode && recipient === null && (
