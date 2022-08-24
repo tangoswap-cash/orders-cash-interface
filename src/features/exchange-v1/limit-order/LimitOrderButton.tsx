@@ -111,7 +111,7 @@ const LimitOrderButton: FC<LimitOrderButtonProps> = ({ currency, color, ...rest 
     chainId && ORDERS_CASH_V1_ADDRESS[chainId]
   )
 
-  const telegramMessage = async () => {
+  const telegramMessage = async (url = takeOrderURL, endTime = endTimeState) => {
 
     const limitPrice = new Price(
       parsedAmounts[Field.INPUT].currency,
@@ -120,7 +120,7 @@ const LimitOrderButton: FC<LimitOrderButtonProps> = ({ currency, color, ...rest 
       parsedAmounts[Field.OUTPUT].quotient
     )
 
-    const ret = await axios.post(`https://orders.cash/api/telegram?url=${takeOrderURL}&endTime=${endTimeState}&fromToken=${parsedAmounts[Field.INPUT].currency.symbol}&fromAmount=${parsedAmounts[Field.INPUT].toSignificant(6)}&toToken=${parsedAmounts[Field.OUTPUT].currency.symbol}&toAmount=${parsedAmounts[Field.OUTPUT].toSignificant(6)}&price=${limitPrice.toSignificant(6)}&priceInvert=${limitPrice.invert().toSignificant(6)}`)
+    const ret = await axios.post(`https://orders.cash/api/telegram?url=${url}&endTime=${endTime}&fromToken=${parsedAmounts[Field.INPUT].currency.symbol}&fromAmount=${parsedAmounts[Field.INPUT].toSignificant(6)}&toToken=${parsedAmounts[Field.OUTPUT].currency.symbol}&toAmount=${parsedAmounts[Field.OUTPUT].toSignificant(6)}&price=${limitPrice.toSignificant(6)}&priceInvert=${limitPrice.invert().toSignificant(6)}`)
     console.log("telegram post result: ", ret);
     wasClicked(true)
   }
@@ -156,7 +156,8 @@ const LimitOrderButton: FC<LimitOrderButtonProps> = ({ currency, color, ...rest 
       // case OrderExpiration.never:
       //   endTime = Number.MAX_SAFE_INTEGER
     }
-    setEndTimeState(new Date(endTime * 1000).toUTCString())
+    let endTimeState = new Date(endTime * 1000).toUTCString()
+    setEndTimeState(endTimeState)
 
     let coinsToTakerAddr
     if (parsedAmounts[Field.INPUT].currency.isNative) {
@@ -235,14 +236,15 @@ const LimitOrderButton: FC<LimitOrderButtonProps> = ({ currency, color, ...rest 
       setOpenConfirmationModal(false)
       
       if (true) {
-        if(isBroadcast == 'true'){
-          telegramMessage()
-        }
         postOrderLocal(openOrderToLocalStorage)
         addPopup({
           txn: { hash: null, summary: 'Limit order created', success: true },
         })
         await mutate()
+        if(isBroadcast == 'true'){
+          wasClicked(true)
+          telegramMessage(url, endTimeState)
+        }
       }
     } catch (e) {
       addPopup({
@@ -307,7 +309,7 @@ const LimitOrderButton: FC<LimitOrderButtonProps> = ({ currency, color, ...rest 
             width: '100%',
           }}
           id="swap-button"
-          disabled={clicked === false ? disabled : true}
+          disabled={(clicked || isBroadcast == 'true') ? true : disabled}
           // error={isValid && priceImpactSeverity > 2}
         >{clicked === false ? (
           <>

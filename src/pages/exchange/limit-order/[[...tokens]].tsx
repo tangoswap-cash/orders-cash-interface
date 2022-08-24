@@ -323,17 +323,16 @@ function LimitOrder() {
 
             <div className="flex flex-col items-end justify-between w-full gap-4 md:flex-row md:items-center">
               {currencies[Field.INPUT] && currencies[Field.OUTPUT] && (
-                <div className="flex flex-1">
-                  <Button 
-                    variant='outlined' 
-                    color={broadcaster == 'true' ? 'pink': 'blue'} 
-                    size='sm' 
-                    onClick={handleBroadcaster}
-                    className='p-1'
-                  >
-                    Broadcastear por Telegram
-                  </Button>
-                </div>
+                
+                    <Button 
+                      variant='outlined' 
+                      color={broadcaster == 'true' ? 'pink': 'blue'} 
+                      size='sm' 
+                      onClick={handleBroadcaster}
+                      className='p-1'
+                    >
+                      Broadcastear por Telegram
+                    </Button>
               )}
               {isExpertMode && recipient === null && (
                 <div
