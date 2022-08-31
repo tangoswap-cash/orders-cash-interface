@@ -6,7 +6,7 @@ import {
   useAllUserPairs,
   useBentoUserTokens,
   useUserAssets,
-} from './../../../features/analytics/Portfolio/hooks'
+} from '../../../features/analytics/Portfolio/hooks'
 
 import AllocationTable from '../../../features/analytics/Portfolio/AllocationTable'
 import AnalyticsContainer from '../../../features/analytics/AnalyticsContainer'

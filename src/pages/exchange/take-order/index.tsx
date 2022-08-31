@@ -3,7 +3,7 @@ import { useBlockNumber } from '../../../state/application/hooks'
 import Button from '../../../components/Button'
 import { ButtonConfirmed, ButtonError } from '../../../components/Button'
 import Alert from '../../../components/Alert'
-import { ArrowLeftIcon } from '@heroicons/react/solid'
+import { ArrowLeftIcon, ClipboardCheckIcon, ClipboardCopyIcon } from '@heroicons/react/solid'
 import { ChainId, Price } from '@tangoswapcash/sdk'
 import Container from '../../../components/Container'
 import DoubleGlowShadow from '../../../components/DoubleGlowShadow'
@@ -12,19 +12,16 @@ import NavLink from '../../../components/NavLink'
 import NetworkGuard from '../../../guards/Network'
 import { t } from '@lingui/macro'
 import { useLingui } from '@lingui/react'
-
 import { useActiveWeb3React } from '../../../hooks/useActiveWeb3React'
 import { useAppDispatch, useAppSelector } from '../../../state/hooks'
 import useParsedQueryString from '../../../hooks/useParsedQueryString'
 import { useExpertModeManager } from '../../../state/user/hooks'
-
+import SUSHI_ABI from '../../../constants/abis/sushi.json'
 import { useEffect, useState } from 'react'
-
 import { BigNumber } from '@ethersproject/bignumber'
 import { getAddress } from '@ethersproject/address'
 import { parseUnits } from '@ethersproject/units'
 import { arrayify, hexlify, splitSignature } from '@ethersproject/bytes'
-
 import { useCurrency } from '../../../hooks/Tokens'
 import CurrencyLogo from '../../../components/CurrencyLogo'
 import { tryParseAmount } from '../../../functions/parse'
@@ -34,7 +31,7 @@ import {
   useV2TradeExactOut as useTradeExactOut,
 } from '../../../hooks/useV2Trades'
 import { Currency } from '@tangoswapcash/sdk'
-import { ApprovalState, useApproveCallback, useLimitOrderContract } from '../../../hooks'
+import { ApprovalState, useApproveCallback, useContract, useLimitOrderContract } from '../../../hooks'
 import Dots from '../../../components/Dots'
 import { useWalletModalToggle } from '../../../state/application/hooks'
 import PriceRatio2 from '../../../features/exchange-v1/limit-order/PriceRatio2'
@@ -44,6 +41,9 @@ import { useCurrencyBalances } from '../../../state/wallet/hooks'
 import { useMemo } from 'react'
 import { useSingleCallResult } from '../../../state/multicall/hooks'
 import LabelTokenCurrency from '../../../components/LabelTokenCurrency'
+import useCopyClipboard from '../../../hooks/useCopyClipboard'
+import Typography from '../../../components/Typography'
+import { getBalanceOf } from '../../../functions/getBalanceOf'
 
 function b64ToUint6(nChr) {
   return nChr > 64 && nChr < 91
@@ -166,6 +166,7 @@ function TakeOrderPage() {
   const { oParam } = useDefaultsFromURLSearch()
   const u8arr = base64DecToArr(oParam, undefined)
   const toggleWalletModal = useWalletModalToggle()
+  const [isCopied, setCopied] = useCopyClipboard(10000)
 
   const CoinTypeToMakerStart = 1
   const AmountToMakerStart = 1 + 20
@@ -246,6 +247,8 @@ function TakeOrderPage() {
     swapErrorMessage: undefined,
     txHash: undefined,
   })
+
+  const [balanceOfMaker, setBalanceOfMaker] = useState(0);
 
   const dueTime = Math.floor(Number(order.dueTime.toString()) / 1_000_000_000)
 
@@ -330,6 +333,7 @@ function TakeOrderPage() {
     [Field.INPUT]: relevantTokenBalances[0],
     [Field.OUTPUT]: relevantTokenBalances[1],
   }
+  
 
   let inputError: string | undefined
   if (!account) {
@@ -359,6 +363,30 @@ function TakeOrderPage() {
 
   const disabled = !!inputError || tokenApprovalState === ApprovalState.PENDING
 
+  let sufficientAmount = false;
+  const WBCHADDRESS = '0x3743ec0673453e5009310c727ba4eaf7b3a1cc04'
+  const BCHADDRESS = '0x0000000000000000000000000000000000002711'
+  const makerPayment = Number(parsedOutputAmount?.toSignificant(6));
+  if (outputCurrency?.symbol == "BCH") {
+    const outputTokenContract = useContract(chainId && BCHADDRESS, SUSHI_ABI, true) 
+    getBalanceOf(outputTokenContract, makerAddress).then((balance) => {
+      setBalanceOfMaker(balance)
+    })
+    balanceOfMaker >= makerPayment ? sufficientAmount = true : sufficientAmount = false;
+  } else if (outputCurrency?.symbol == "WBCH") {
+    const outputTokenContract = useContract(chainId && WBCHADDRESS, SUSHI_ABI, true) 
+    getBalanceOf(outputTokenContract, makerAddress).then((balance) => {
+      setBalanceOfMaker(balance)
+    })
+    balanceOfMaker >= makerPayment ? sufficientAmount = true : sufficientAmount = false;
+  } else {
+    const outputTokenContract = useContract(chainId && outputCurrency?.wrapped?.address, SUSHI_ABI, true) 
+    getBalanceOf(outputTokenContract, makerAddress).then((balance) => {
+      setBalanceOfMaker(balance)
+    })
+    balanceOfMaker >= makerPayment ? sufficientAmount = true : sufficientAmount = false;
+  }
+
   let button = (
     <Button disabled={true} color={true ? 'gray' : 'pink'} className="mb-4">
       (<Dots>{i18n._(t`Loading order`)}</Dots>)
@@ -367,7 +395,7 @@ function TakeOrderPage() {
 
   if (!account)
     button = (
-      <Button disabled={disabled} color="pink" onClick={toggleWalletModal}>
+      <Button color="pink" onClick={toggleWalletModal}>
         {i18n._(t`Connect Wallet`)}
       </Button>
     )
@@ -387,6 +415,12 @@ function TakeOrderPage() {
         )}
       </Button>
     )
+  else if (sufficientAmount == false) 
+    button = (
+      <Button disabled={true} color="gray">
+        {i18n._(t`Maker's Balance Is Not Enough`)}
+      </Button>
+    )
   else {
     button = (
       <ButtonError onClick={handleSwap} id="swap-button" disabled={disabled} error={disabled}>
@@ -395,6 +429,10 @@ function TakeOrderPage() {
     )
   }
 
+  let buttonCoppy = isCopied ? 
+    <ClipboardCheckIcon width={16} height={16} onClick={() => setCopied(makerAddress)} className="cursor-pointer ml-1"/> : 
+    <ClipboardCopyIcon width={16} height={16} onClick={() => setCopied(makerAddress)} className="cursor-pointer ml-1"/>
+  
   return (
     <Container id="take-order-page" className="py-4 md:py-8 lg:py-12" maxWidth="lg">
       <Head>
@@ -413,7 +451,7 @@ function TakeOrderPage() {
                 tokenAddress={inputCurrency?.wrapped?.address}
               />
             </div>
-            <div className="flex justify-between px-5 py-3 rounded bg-dark-800">
+            <div className="flex justify-between px-5 py-3 rounded bg-dark-800 items-center">
               <span className="font-bold text-secondary">{i18n._(t`Rate`)}</span>
               <span className="text-primary">
                 <PriceRatio2 currentPrice={limitPrice} currencies={currencies} parsedAmounts={parsedAmounts} />
@@ -431,6 +469,32 @@ function TakeOrderPage() {
           <div className="flex justify-between px-5 py-3 rounded bg-dark-800">
             <span className="font-bold text-secondary">{i18n._(t`Order Expiration`)}</span>
             <span className="text-primary">{formatDateTime(dueTime) + ' ' + expiration}</span>
+          </div>
+
+          <div className='flex flex-col rounded bg-dark-800'>
+            <div className="flex justify-between px-5 py-1 items-center">
+              <span className="font-bold text-secondary">{i18n._(t`Maker address`)}</span>
+              <div className="flex items-center">
+                {
+                  makerAddress ? 
+                    <Typography variant="sm" className="flex text-primary truncate">
+                      {makerAddress.substring(0, 23) + '...'} {buttonCoppy}
+                    </Typography> : 
+                    <Dots><span/></Dots>
+                }
+              </div>
+            </div>
+            <div className="flex justify-between px-5 py-1">
+              <span className="font-bold text-secondary">{i18n._(t`Order status`)}</span>
+              <span className="text-primary ">
+                {makerAddress ? 
+                  sufficientAmount ?
+                    i18n._(t`Available`) 
+                   : i18n._(t`Maker's Balance Is Not Enough`)
+                   : <Dots><span/></Dots>
+                }
+              </span>
+            </div>
           </div>
 
           {button}
