@@ -12,7 +12,7 @@ import { Trans } from '@lingui/react'
 import { FLEXUSD } from '@tangoswapcash/sdk'
 import { t } from '@lingui/macro'
 import { useLingui } from '@lingui/react'
-import PriceRatio from './PriceRatio'
+import PriceRatio from '../../../features/exchange-v1/limit-order/PriceRatio'
 
 interface ConfirmLimitOrderModalProps {
   open: boolean
