@@ -333,7 +333,7 @@ function TakeOrderPage() {
     [Field.INPUT]: relevantTokenBalances[0],
     [Field.OUTPUT]: relevantTokenBalances[1],
   }
-  
+
 
   let inputError: string | undefined
   if (!account) {
@@ -367,25 +367,19 @@ function TakeOrderPage() {
   const WBCHADDRESS = '0x3743ec0673453e5009310c727ba4eaf7b3a1cc04'
   const BCHADDRESS = '0x0000000000000000000000000000000000002711'
   const makerPayment = Number(parsedOutputAmount?.toSignificant(6));
+
+  let address = chainId && outputCurrency?.wrapped?.address
+
   if (outputCurrency?.symbol == "BCH") {
-    const outputTokenContract = useContract(chainId && BCHADDRESS, SUSHI_ABI, true) 
-    getBalanceOf(outputTokenContract, makerAddress).then((balance) => {
-      setBalanceOfMaker(balance)
-    })
-    balanceOfMaker >= makerPayment ? sufficientAmount = true : sufficientAmount = false;
+    address = chainId && BCHADDRESS
   } else if (outputCurrency?.symbol == "WBCH") {
-    const outputTokenContract = useContract(chainId && WBCHADDRESS, SUSHI_ABI, true) 
-    getBalanceOf(outputTokenContract, makerAddress).then((balance) => {
-      setBalanceOfMaker(balance)
-    })
-    balanceOfMaker >= makerPayment ? sufficientAmount = true : sufficientAmount = false;
-  } else {
-    const outputTokenContract = useContract(chainId && outputCurrency?.wrapped?.address, SUSHI_ABI, true) 
-    getBalanceOf(outputTokenContract, makerAddress).then((balance) => {
-      setBalanceOfMaker(balance)
-    })
-    balanceOfMaker >= makerPayment ? sufficientAmount = true : sufficientAmount = false;
+    address = chainId && WBCHADDRESS;
   }
+  const outputTokenContract = useContract(chainId && BCHADDRESS, SUSHI_ABI, true)
+  getBalanceOf(outputTokenContract, makerAddress).then((balance) => {
+    setBalanceOfMaker(balance)
+  })
+  sufficientAmount = balanceOfMaker >= makerPayment
 
   let button = (
     <Button disabled={true} color={true ? 'gray' : 'pink'} className="mb-4">
@@ -415,7 +409,7 @@ function TakeOrderPage() {
         )}
       </Button>
     )
-  else if (sufficientAmount == false) 
+  else if (sufficientAmount == false)
     button = (
       <Button disabled={true} color="gray">
         {i18n._(t`Maker's Balance Is Not Enough`)}
@@ -429,10 +423,10 @@ function TakeOrderPage() {
     )
   }
 
-  let buttonCoppy = isCopied ? 
-    <ClipboardCheckIcon width={16} height={16} onClick={() => setCopied(makerAddress)} className="cursor-pointer ml-1"/> : 
+  let buttonCoppy = isCopied ?
+    <ClipboardCheckIcon width={16} height={16} onClick={() => setCopied(makerAddress)} className="cursor-pointer ml-1"/> :
     <ClipboardCopyIcon width={16} height={16} onClick={() => setCopied(makerAddress)} className="cursor-pointer ml-1"/>
-  
+
   return (
     <Container id="take-order-page" className="py-4 md:py-8 lg:py-12" maxWidth="lg">
       <Head>
@@ -445,9 +439,9 @@ function TakeOrderPage() {
           <div className="flex flex-col gap-6">
             <div className="flex flex-col gap-3">
               <div className="text-xl font-bold text-white">{i18n._(t`You pay:`)}</div>
-              <LabelTokenCurrency 
-                currency={inputCurrency} 
-                parsedAmount={parsedInputAmount?.toSignificant(6)} 
+              <LabelTokenCurrency
+                currency={inputCurrency}
+                parsedAmount={parsedInputAmount?.toSignificant(6)}
                 tokenAddress={inputCurrency?.wrapped?.address}
               />
             </div>
@@ -461,7 +455,7 @@ function TakeOrderPage() {
               <div className="flex gap-2 text-xl font-bold text-white">{i18n._(t`You receive:`)}</div>
               <LabelTokenCurrency
                 currency={outputCurrency}
-                parsedAmount={parsedOutputAmount?.toSignificant(6)} 
+                parsedAmount={parsedOutputAmount?.toSignificant(6)}
                 tokenAddress={outputCurrency?.wrapped?.address}
                />
             </div>
@@ -476,10 +470,10 @@ function TakeOrderPage() {
               <span className="font-bold text-secondary">{i18n._(t`Maker address`)}</span>
               <div className="flex items-center">
                 {
-                  makerAddress ? 
+                  makerAddress ?
                     <Typography variant="sm" className="flex text-primary truncate">
                       {makerAddress.substring(0, 23) + '...'} {buttonCoppy}
-                    </Typography> : 
+                    </Typography> :
                     <Dots><span/></Dots>
                 }
               </div>
@@ -487,9 +481,9 @@ function TakeOrderPage() {
             <div className="flex justify-between px-5 py-1">
               <span className="font-bold text-secondary">{i18n._(t`Order status`)}</span>
               <span className="text-primary ">
-                {makerAddress ? 
+                {makerAddress ?
                   sufficientAmount ?
-                    i18n._(t`Available`) 
+                    i18n._(t`Available`)
                    : i18n._(t`Maker's Balance Is Not Enough`)
                    : <Dots><span/></Dots>
                 }
