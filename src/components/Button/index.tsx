@@ -29,6 +29,7 @@ const OUTLINED = {
   green: 'bg-green bg-opacity-20 border border-green rounded text-green hover:bg-opacity-40 disabled:bg-opacity-20',
   gradient:
     'border border-transparent border-gradient-r-blue-pink-dark-900 opacity-80 hover:opacity-100 disabled:bg-opacity-20',
+  border: 'border border-[#546D2A] bg-blue bg-opacity-20 outline-blue rounded text-primary hover:bg-opacity-40 disabled:bg-opacity-20',
 }
 
 const EMPTY = {
@@ -48,7 +49,7 @@ const VARIANT = {
   link: LINK,
 }
 
-export type ButtonColor = 'blue' | 'pink' | 'gradient' | 'gray' | 'default' | 'red' | 'green'
+export type ButtonColor = 'blue' | 'pink' | 'gradient' | 'gray' | 'default' | 'red' | 'green' | 'border'
 
 export type ButtonSize = 'xs' | 'sm' | 'lg' | 'default' | 'none'
 
