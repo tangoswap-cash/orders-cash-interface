@@ -368,22 +368,6 @@ function TakeOrderPage() {
   const BCHADDRESS = '0x0000000000000000000000000000000000002711'
   const makerPayment = Number(parsedOutputAmount?.toSignificant(6));
 
-  // if (outputCurrency?.symbol == "BCH") {
-  //   const outputTokenContract = useContract(chainId && BCHADDRESS, SUSHI_ABI, true)
-  // } else if (outputCurrency?.symbol == "WBCH") {
-  //   const outputTokenContract = useContract(chainId && WBCHADDRESS, SUSHI_ABI, true)
-  //   getBalanceOf(outputTokenContract, makerAddress).then((balance) => {
-  //     setBalanceOfMaker(balance)
-  //   })
-  //   balanceOfMaker >= makerPayment ? sufficientAmount = true : sufficientAmount = false;
-  // } else {
-  //   const outputTokenContract = useContract(chainId && outputCurrency?.wrapped?.address, SUSHI_ABI, true)
-  //   getBalanceOf(outputTokenContract, makerAddress).then((balance) => {
-  //     setBalanceOfMaker(balance)
-  //   })
-  //   balanceOfMaker >= makerPayment ? sufficientAmount = true : sufficientAmount = false;
-  // }
-
   let address = chainId && outputCurrency?.wrapped?.address
 
   if (outputCurrency?.symbol == "BCH") {
