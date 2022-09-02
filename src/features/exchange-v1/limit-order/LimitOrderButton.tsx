@@ -36,6 +36,8 @@ import { faTelegram } from '@fortawesome/free-brands-svg-icons';
 import axios from 'axios'
 import { faCheck } from '@fortawesome/free-solid-svg-icons'
 import CashAddressInput from '../../../components/Input/Cashaddress'
+import useGetOrdersLocal from '../../../hooks/useGetOrdersLocal'
+import useGetlocalStorage from '../../../hooks/useGetLocalStorage'
 
 interface LimitOrderButtonProps extends ButtonProps {
   currency: Currency
@@ -90,16 +92,17 @@ const LimitOrderButton: FC<LimitOrderButtonProps> = ({ currency, color, ...rest 
   const dispatch = useDispatch<AppDispatch>()
   const addPopup = useAddPopup()
   const toggleWalletModal = useWalletModalToggle()
-
   const [openConfirmationModal, setOpenConfirmationModal] = useState(false)
   const [takeOrderURL, setTakeOrderURL] = useState<string>(null)
 
   const [isCopied, setCopied] = useCopyClipboard(10000)
   const [clicked, wasClicked] = useState(false)
   const [endTimeState, setEndTimeState] = useState<string>(null)
+  const isBroadcast = useGetlocalStorage('broadcaster') ?? 'false'
+  const orders = useGetOrdersLocal()
 
   const { orderExpiration, recipient } = useLimitOrderState()
-  const { parsedAmounts, inputError } = useDerivedLimitOrderInfo()
+  const { parsedAmounts, inputError, currencies } = useDerivedLimitOrderInfo()
 
   const { mutate } = useLimitOrders()
 
@@ -108,6 +111,20 @@ const LimitOrderButton: FC<LimitOrderButtonProps> = ({ currency, color, ...rest 
     chainId && ORDERS_CASH_V1_ADDRESS[chainId]
   )
 
+  const telegramMessage = async (url = takeOrderURL, endTime = endTimeState) => {
+
+    const limitPrice = new Price(
+      parsedAmounts[Field.INPUT].currency,
+      parsedAmounts[Field.OUTPUT].currency,
+      parsedAmounts[Field.INPUT].quotient,
+      parsedAmounts[Field.OUTPUT].quotient
+    )
+
+    const ret = await axios.post(`https://orders.cash/api/telegram?url=${url}&endTime=${endTime}&fromToken=${parsedAmounts[Field.INPUT].currency.symbol}&fromAmount=${parsedAmounts[Field.INPUT].toSignificant(6)}&toToken=${parsedAmounts[Field.OUTPUT].currency.symbol}&toAmount=${parsedAmounts[Field.OUTPUT].toSignificant(6)}&price=${limitPrice.toSignificant(6)}&priceInvert=${limitPrice.invert().toSignificant(6)}`)
+    console.log("telegram post result: ", ret);
+    wasClicked(true)
+  }
+
   const showTokenApprove =
     chainId &&
     currency &&
@@ -115,6 +132,10 @@ const LimitOrderButton: FC<LimitOrderButtonProps> = ({ currency, color, ...rest 
     (tokenApprovalState === ApprovalState.NOT_APPROVED || tokenApprovalState === ApprovalState.PENDING)
 
   const disabled = !!inputError || tokenApprovalState === ApprovalState.PENDING
+  
+  const postOrderLocal = (newOrder) => {
+    localStorage.setItem('orders', JSON.stringify([...orders, newOrder]))
+  }
 
   const handler = useCallback(async () => {
     const signer = library.getSigner()
@@ -135,7 +156,8 @@ const LimitOrderButton: FC<LimitOrderButtonProps> = ({ currency, color, ...rest 
       // case OrderExpiration.never:
       //   endTime = Number.MAX_SAFE_INTEGER
     }
-    setEndTimeState(new Date(endTime * 1000).toUTCString())
+    let endTimeState = new Date(endTime * 1000).toUTCString()
+    setEndTimeState(endTimeState)
 
     let coinsToTakerAddr
     if (parsedAmounts[Field.INPUT].currency.isNative) {
@@ -188,6 +210,18 @@ const LimitOrderButton: FC<LimitOrderButtonProps> = ({ currency, color, ...rest 
     }
 
     try {
+      let outputValue = parsedAmounts[Field.OUTPUT]?.toSignificant(6)
+      let inputValue = parsedAmounts[Field.INPUT]?.toSignificant(6)
+      let openOrderToLocalStorage = {
+        id: Date.now(),
+        status: 'open',
+        account,
+        input: {value: inputValue, currency: {...currencies[Field.INPUT], address: currencies[Field.INPUT]?.wrapped.address}},
+        output: {value: outputValue, currency: currencies[Field.OUTPUT]?.tokenInfo ? currencies[Field.OUTPUT]?.tokenInfo : currencies[Field.OUTPUT]},
+        orderExpiration: orderExpiration.label,
+        rate: Number((parseFloat(outputValue) / parseFloat(inputValue))?.toFixed(2))
+      }
+
       const sig = await signer._signTypedData(Domain, Types, msg)
       // o=ver8,coinsToMaker256,coinsToTaker256,dueTime80,r256,s256,v8
       const order = '01'
@@ -197,19 +231,22 @@ const LimitOrderButton: FC<LimitOrderButtonProps> = ({ currency, color, ...rest 
         + sig.substr(2)
 
       const url = 'https://orders.cash/take?o=' + base64EncArr(hexToArr(order))
-      console.log('url: ', url)
+
       setTakeOrderURL(url)
-
       setOpenConfirmationModal(false)
-
+      
       if (true) {
+        postOrderLocal(openOrderToLocalStorage)
         addPopup({
           txn: { hash: null, summary: 'Limit order created', success: true },
         })
         await mutate()
+        if(isBroadcast == 'true'){
+          wasClicked(true)
+          telegramMessage(url, endTimeState)
+        }
       }
     } catch (e) {
-      console.log('error: ', e)
       addPopup({
         txn: {
           hash: null,
@@ -242,21 +279,6 @@ const LimitOrderButton: FC<LimitOrderButtonProps> = ({ currency, color, ...rest 
     </>
   )
 
-  const telegramMessage = async () => {
-
-    const limitPrice = new Price(
-      parsedAmounts[Field.INPUT].currency,
-      parsedAmounts[Field.OUTPUT].currency,
-      parsedAmounts[Field.INPUT].quotient,
-      parsedAmounts[Field.OUTPUT].quotient
-    )
-
-    const ret = await axios.post(`https://orders.cash/api/telegram?url=${takeOrderURL}&endTime=${endTimeState}&fromToken=${parsedAmounts[Field.INPUT].currency.symbol}&fromAmount=${parsedAmounts[Field.INPUT].toSignificant(6)}&toToken=${parsedAmounts[Field.OUTPUT].currency.symbol}&toAmount=${parsedAmounts[Field.OUTPUT].toSignificant(6)}&price=${limitPrice.toSignificant(6)}&priceInvert=${limitPrice.invert().toSignificant(6)}`)
-    console.log("telegram post result: ", ret);
-    wasClicked(true)
-  }
-
-
   if (!account)
     button = (
       <Button color="pink" onClick={toggleWalletModal} {...rest}>
@@ -287,7 +309,7 @@ const LimitOrderButton: FC<LimitOrderButtonProps> = ({ currency, color, ...rest 
             width: '100%',
           }}
           id="swap-button"
-          disabled={clicked === false ? disabled : true}
+          disabled={(clicked || isBroadcast == 'true') ? true : disabled}
           // error={isValid && priceImpactSeverity > 2}
         >{clicked === false ? (
           <>
@@ -337,7 +359,6 @@ const LimitOrderButton: FC<LimitOrderButtonProps> = ({ currency, color, ...rest 
           </Button>
         </div>
       }
-
       {button}
 
       <style jsx>{`

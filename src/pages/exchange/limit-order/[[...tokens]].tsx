@@ -40,6 +40,9 @@ import { useActiveWeb3React } from '../../../hooks'
 import { useExpertModeManager } from '../../../state/user/hooks'
 import { useLingui } from '@lingui/react'
 import Image from 'next/image'
+import Checkbox from '../../../components/Checkbox'
+import useGetOrdersLocal from '../../../hooks/useGetOrdersLocal'
+import useGetlocalStorage from '../../../hooks/useGetLocalStorage'
 
 const areEqual = (first, second) => {
   if (first.length !== second.length) {
@@ -56,6 +59,7 @@ const areEqual = (first, second) => {
 function LimitOrder() {
   const { i18n } = useLingui()
   const { chainId, account } = useActiveWeb3React()
+  const [broadcaster, setBroadcaster] = useState(useGetlocalStorage('broadcaster') ?? 'false')
 
   const loadedUrlParams = useDefaultsFromURLSearch()
   const [loadedInputCurrency, loadedOutputCurrency] = [
@@ -200,6 +204,12 @@ function LimitOrder() {
     }, [])
   }, [pairs])
 
+  const handleBroadcaster = () => {
+    let broadcast = broadcaster == 'true' ? 'false' : 'true';
+    localStorage.setItem('broadcaster', broadcast)
+    setBroadcaster(broadcast)
+  }
+
   const outputTokenList = useMemo(() => {
     if (pairs.length === 0) return []
     if (currencies[Field.INPUT]) {
@@ -313,9 +323,16 @@ function LimitOrder() {
 
             <div className="flex flex-col items-end justify-between w-full gap-4 md:flex-row md:items-center">
               {currencies[Field.INPUT] && currencies[Field.OUTPUT] && (
-                <div className="flex flex-1">
-                  <PriceRatio />
-                </div>
+                
+                    <Button 
+                      variant='outlined' 
+                      color={broadcaster == 'true' ? 'pink': 'blue'} 
+                      size='sm' 
+                      onClick={handleBroadcaster}
+                      className='p-1'
+                    >
+                      {i18n._(t`Send to`)} Telegram
+                    </Button>
               )}
               {isExpertMode && recipient === null && (
                 <div
@@ -334,10 +351,9 @@ function LimitOrder() {
               {!(currencies[Field.INPUT] && currencies[Field.OUTPUT]) && !(isExpertMode && recipient === null) && (
                 <div className="flex flex-1" />
               )}
-
+              
               <OrderExpirationDropdown />
             </div>
-
             <div className="flex flex-col gap-3">
               <LimitOrderButton color="gradient" className="font-bold" currency={currencies[Field.INPUT]} />
             </div>
