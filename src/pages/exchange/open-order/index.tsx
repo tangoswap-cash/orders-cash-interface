@@ -3,22 +3,23 @@
 import Alert from '../../../components/Alert'
 import { ArrowLeftIcon } from '@heroicons/react/solid'
 import { ChainId } from '@tangoswapcash/sdk'
-// import CompletedOrders from '../../../features/exchange-v1/open-order/CompletedOrders'
+import CompletedOrders from '../../../features/exchange-v1/open-order/CompletedOrders'
 import Container from '../../../components/Container'
 import DoubleGlowShadow from '../../../components/DoubleGlowShadow'
 import Head from 'next/head'
 import NavLink from '../../../components/NavLink'
 import NetworkGuard from '../../../guards/Network'
-// import OpenOrders from '../../../features/exchange-v1/open-order/OpenOrders'
-import React from 'react'
+import OpenOrders from '../../../features/exchange-v1/open-order/OpenOrders'
+import React, { useState } from 'react'
 import { t } from '@lingui/macro'
-// import useLimitOrders from '../../../hooks/useLimitOrders'
+import useLimitOrders from '../../../hooks/useLimitOrders'
 import { useLingui } from '@lingui/react'
+import { useLimitOrderApproveCallback } from '../../../hooks/useLimitOrderApproveCallback'
+import useGetOrdersLocal from '../../../hooks/useGetOrdersLocal'
 
 function OpenOrdersPage() {
-  /*
+  const [orders, setOrders] = useState(useGetOrdersLocal())
   const { i18n } = useLingui()
-  const [approvalState] = useLimitOrderApproveCallback()
   const { pending } = useLimitOrders()
 
   return (
@@ -36,7 +37,7 @@ function OpenOrdersPage() {
             </a>
           </NavLink>
         </div>
-        {pending.totalOrders > 0 && approvalState === BentoApprovalState.NOT_APPROVED && (
+        {pending.totalOrders > 0  && ( //&& approvalState === BentoApprovalState.NOT_APPROVED
           <div className="flex pb-6">
             <Alert
               type="error"
@@ -49,18 +50,18 @@ function OpenOrdersPage() {
         )}
         <DoubleGlowShadow>
           <div id="limit-order-page" className="flex flex-col w-full gap-4 p-3 rounded md:p-5 bg-dark-900">
-            <OpenOrders />
-            <CompletedOrders />
+            <OpenOrders orders={orders} setOrders={setOrders}/>
+            <CompletedOrders orders={orders} setOrders={setOrders}/>
           </div>
         </DoubleGlowShadow>
       </div>
     </Container>
   )
-  */
-  return (
-    <Container id="open-order-page" className="py-4 md:py-8 lg:py-12" maxWidth="2xl">
-    </Container>
-  )
+  
+  // return (
+  //   <Container id="open-order-page" className="py-4 md:py-8 lg:py-12" maxWidth="2xl">
+  //   </Container>
+  // )
 }
 
 export default OpenOrdersPage

@@ -73,11 +73,11 @@ const CurrencyLogo: FunctionComponent<CurrencyLogoProps> = ({
     if (currency["logoURI"]) {
       return [currency["logoURI"]]
     }
-
-    if (currency.isNative || currency.equals(WNATIVE[currency.chainId])) {
+    
+    if (currency.symbol == 'WBCH' || currency.isNative || currency.equals(WNATIVE[currency.chainId])) {
       return [LOGO[currency.chainId], unknown]
     }
-
+    
     if (currency.isToken) {
       const defaultUrls = [...getCurrencyLogoUrls(currency)]
       if (currency instanceof WrappedTokenInfo) {

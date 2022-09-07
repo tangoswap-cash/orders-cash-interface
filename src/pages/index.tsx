@@ -2,6 +2,7 @@ import Container from '../components/Container'
 import Head from 'next/head'
 // import Swap from './exchange/smart-swap/[[...tokens]]'
 import LimitOrder from './exchange/limit-order/[[...tokens]]'
+import OpenOrdersPage from './exchange/open-order'
 
 export default function Dashboard() {
   return LimitOrder()
@@ -11,6 +12,8 @@ export default function Dashboard() {
   //       <title>Dashboard | Orders.Cash</title>
   //       <meta name="description" content="Tango" />
   //     </Head>
+  //     <LimitOrder />
+  //     <OpenOrdersPage />
   //   </Container>
   // )
 }
