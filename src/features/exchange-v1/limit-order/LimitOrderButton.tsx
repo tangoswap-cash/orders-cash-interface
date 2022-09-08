@@ -133,6 +133,7 @@ const LimitOrderButton: FC<LimitOrderButtonProps> = ({ currency, color, ...rest 
     input: {value: inputValue, currency: {...currencies[Field.INPUT], address: currencies[Field.INPUT]?.wrapped.address}},
     output: {value: outputValue, currency: currencies[Field.OUTPUT]?.tokenInfo ? currencies[Field.OUTPUT]?.tokenInfo : currencies[Field.OUTPUT]},
     orderExpiration: orderExpiration.label,
+    duetime: '',
     rate: Number((parseFloat(outputValue) / parseFloat(inputValue))?.toFixed(2))
   }
   console.log('openOrderToLocalStorage: ', openOrderToLocalStorage)
@@ -208,7 +209,7 @@ const LimitOrderButton: FC<LimitOrderButtonProps> = ({ currency, color, ...rest 
       ],
     }
     const rawDueTime = hexStr32(expirePicosecondsBN).substr(64 + 2 - 20);
-    console.log(rawDueTime);
+    console.log(parseInt(rawDueTime, 16));
         
     try {
       let outputValue = parsedAmounts[Field.OUTPUT]?.toSignificant(6)

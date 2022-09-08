@@ -386,14 +386,7 @@ function TakeOrderPage() {
     })
     balanceOfMaker >= makerPayment ? sufficientAmount = true : sufficientAmount = false;
   }
-
-  // Hacer un boton en take que solo se muestre si la orden no esta:
-  // El address del maker = La cuenta conectada. HECHO
-  // La orden no tiene que estar expirada.
-  // La orden no tiene que estar Cancelada.
-  // La orden no tiene que estar tomada.
-  // limitOrderContract.addNewDueTime(order.dueTime.toString())
-  // const limitOrderContract = useLimitOrderContract()
+  
   const limitOrderContract = useLimitOrderContract()
   const [isCanceled, setIsCanceled] = useState(false)
 
