@@ -85,7 +85,7 @@ function useDefaultsFromURLSearch():
       oParam: string | undefined
     }
   | undefined {
-  const { chainId } = useActiveWeb3React()
+  const { chainId, account } = useActiveWeb3React()
   const parsedQs = useParsedQueryString()
 
   if (!chainId) return
@@ -192,10 +192,8 @@ function TakeOrderPage() {
     v: BigNumber.from(hexlify(u8arr.slice(SigVStart))),
   }
 
-  // window.order = order
-
   const { i18n } = useLingui()
-
+  const limitOrderContract = useLimitOrderContract()
   const { account, chainId, library } = useActiveWeb3React()
   let coinTypeToMaker = order.coinTypeToMaker
   if (coinTypeToMaker == SEP206_ADDRESS[chainId]) {
@@ -251,6 +249,7 @@ function TakeOrderPage() {
   const [balanceOfMaker, setBalanceOfMaker] = useState(0);
 
   const dueTime = Math.floor(Number(order.dueTime.toString()) / 1_000_000_000)
+  console.log(order.dueTime.toString());
 
   useEffect(() => {
     const now = new Date().getTime()
@@ -334,7 +333,6 @@ function TakeOrderPage() {
     [Field.OUTPUT]: relevantTokenBalances[1],
   }
 
-
   let inputError: string | undefined
   if (!account) {
     inputError = 'Connect Wallet'
@@ -358,7 +356,7 @@ function TakeOrderPage() {
   const isReplayed = useIsReplay(makerAddress, order.dueTime.toString())
   // console.log('isReplayed: ', isReplayed)
   if (isReplayed) {
-    inputError = i18n._(t`Order already dealt`)
+    inputError = i18n._(t`Order Fulfilled`)
   }
 
   const disabled = !!inputError || tokenApprovalState === ApprovalState.PENDING
@@ -381,18 +379,38 @@ function TakeOrderPage() {
   })
   sufficientAmount = balanceOfMaker >= makerPayment
 
+  const [isCanceled, setIsCanceled] = useState(false)
+
+  const cancelOrderCall = async () => {
+    await limitOrderContract.addNewDueTime(order.dueTime.toString())
+    setIsCanceled(true)
+  }
+ 
   let button = (
     <Button disabled={true} color={true ? 'gray' : 'pink'} className="mb-4">
       (<Dots>{i18n._(t`Loading order`)}</Dots>)
     </Button>
   )
-
   if (!account)
     button = (
       <Button color="pink" onClick={toggleWalletModal}>
         {i18n._(t`Connect Wallet`)}
       </Button>
     )
+  else if (makerAddress || inputError == `Insufficient ${currencies[Field.INPUT]?.symbol} balance`) 
+    if (account == makerAddress && inputError !== "Order Fulfilled") {
+      !isCanceled ? 
+      button = (
+      <Button color='pink' onClick={cancelOrderCall}>
+        {i18n._(t`Cancel Order`)} 
+      </Button>
+      )
+      : button = (
+        <Button disabled={true} color='gray'>
+          {i18n._(t`Order Canceled`)}
+        </Button>
+      )
+    }
   else if (inputError)
     button = (
       <Button disabled={true} color="gray">
@@ -426,7 +444,6 @@ function TakeOrderPage() {
   let buttonCoppy = isCopied ?
     <ClipboardCheckIcon width={16} height={16} onClick={() => setCopied(makerAddress)} className="cursor-pointer ml-1"/> :
     <ClipboardCopyIcon width={16} height={16} onClick={() => setCopied(makerAddress)} className="cursor-pointer ml-1"/>
-
   return (
     <Container id="take-order-page" className="py-4 md:py-8 lg:py-12" maxWidth="lg">
       <Head>
@@ -481,7 +498,15 @@ function TakeOrderPage() {
             <div className="flex justify-between px-5 py-1">
               <span className="font-bold text-secondary">{i18n._(t`Order status`)}</span>
               <span className="text-primary ">
-                {makerAddress ?
+                {isCanceled ? 
+                  i18n._(t`Order Canceled`) 
+                :
+                inputError ? 
+                 inputError !== `Insufficient ${currencies[Field.INPUT]?.symbol} balance` ?
+                  inputError
+                : i18n._(t`Available`) 
+                :
+                makerAddress ? 
                   sufficientAmount ?
                     i18n._(t`Available`)
                    : i18n._(t`Maker's Balance Is Not Enough`)
