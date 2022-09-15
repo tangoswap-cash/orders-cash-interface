@@ -359,7 +359,6 @@ function TakeOrderPage() {
     inputError = i18n._(t`Order Fulfilled`)
   }
 
-
   const disabled = !!inputError || tokenApprovalState === ApprovalState.PENDING
 
   let sufficientAmount = false;
