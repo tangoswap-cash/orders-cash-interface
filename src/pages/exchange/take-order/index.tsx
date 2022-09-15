@@ -442,7 +442,7 @@ function TakeOrderPage() {
     )
   }
 
-  let buttonCoppy = isCopied ? 
+  let buttonCoppy = isCopied ?
     <ClipboardCheckIcon width={16} height={16} onClick={() => setCopied(makerAddress)} className="cursor-pointer ml-1"/> :
     <ClipboardCopyIcon width={16} height={16} onClick={() => setCopied(makerAddress)} className="cursor-pointer ml-1"/>
   return (
