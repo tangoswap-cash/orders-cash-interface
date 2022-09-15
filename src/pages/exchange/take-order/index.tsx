@@ -488,7 +488,7 @@ function TakeOrderPage() {
               <span className="font-bold text-secondary">{i18n._(t`Maker address`)}</span>
               <div className="flex items-center">
                 {
-                  makerAddress ? 
+                  makerAddress ?
                     <Typography variant="sm" className="flex text-primary truncate">
                       {makerAddress.substring(0, 23) + '...'} {buttonCoppy}
                     </Typography> : 
