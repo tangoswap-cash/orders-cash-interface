@@ -54,6 +54,7 @@ interface CurrencyLogoProps {
 
 const unknown = 'https://raw.githubusercontent.com/tangoswap-cash/icons/master/token/unknown.png'
 
+
 const CurrencyLogo: FunctionComponent<CurrencyLogoProps> = ({
   currency,
   size = '24px',
@@ -64,7 +65,7 @@ const CurrencyLogo: FunctionComponent<CurrencyLogoProps> = ({
   const uriLocations = useHttpLocations(
     currency instanceof WrappedTokenInfo ? currency.logoURI || currency.tokenInfo.logoURI : undefined
   )
-
+  
   const srcs = useMemo(() => {
     if (!currency) {
       return [unknown]
@@ -74,10 +75,10 @@ const CurrencyLogo: FunctionComponent<CurrencyLogoProps> = ({
       return [currency["logoURI"]]
     }
 
-    if (currency.isNative || currency.equals(WNATIVE[currency.chainId])) {
+    if (currency.symbol == 'WBCH' || currency.isNative || currency.equals(WNATIVE[currency.chainId])) {
       return [LOGO[currency.chainId], unknown]
     }
-
+    
     if (currency.isToken) {
       const defaultUrls = [...getCurrencyLogoUrls(currency)]
       if (currency instanceof WrappedTokenInfo) {

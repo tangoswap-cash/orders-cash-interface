@@ -63,9 +63,14 @@ const nextConfig = {
         destination: '/exchange/limit-order',
       },
       {
+        source: '/open-order',
+        destination: '/exchange/open-order',
+      },
+      {
         source: '/limit-order/:token*',
         destination: '/exchange/limit-order/:token*',
       },
+      
       {
         source: '/take-order',
         has: [{ type: 'query', key: 'o', value: '(?<override>.*)' }],
