@@ -332,7 +332,6 @@ function TakeOrderPage() {
     [Field.INPUT]: relevantTokenBalances[0],
     [Field.OUTPUT]: relevantTokenBalances[1],
   }
-  
 
   let inputError: string | undefined
   if (!account) {
@@ -381,6 +380,8 @@ function TakeOrderPage() {
     })
   sufficientAmount = balanceOfMaker >= makerPayment
     
+  const [isCanceled, setIsCanceled] = useState(false)
+
   const [isCanceled, setIsCanceled] = useState(false)
 
   const cancelOrderCall = async () => {
@@ -448,7 +449,7 @@ function TakeOrderPage() {
   let buttonCoppy = isCopied ? 
     <ClipboardCheckIcon width={16} height={16} onClick={() => setCopied(makerAddress)} className="cursor-pointer ml-1"/> : 
     <ClipboardCopyIcon width={16} height={16} onClick={() => setCopied(makerAddress)} className="cursor-pointer ml-1"/>
-  
+
   return (
     <Container id="take-order-page" className="py-4 md:py-8 lg:py-12" maxWidth="lg">
       <Head>
