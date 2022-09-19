@@ -16,8 +16,11 @@ import useCopyClipboard from '../../../hooks/useCopyClipboard'
 
 const CompletedOrders = ({ orders, setOrders}) => {
   const { i18n } = useLingui()
-  const totalCompleted = orders.reduce((a,b) => b.status !== 'open' && a + 1, 0)
+  const totalCompleted = orders.reduce((a,b) => b.status && a + 1, 0)
+
   console.log(orders)
+  console.log('totalCompleted:', totalCompleted);
+
   return (
     <>
       <div className="flex items-center gap-2 pb-4 text-xl border-b text-high-emphesis border-dark-800">

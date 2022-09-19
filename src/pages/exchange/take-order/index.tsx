@@ -44,6 +44,7 @@ import LabelTokenCurrency from '../../../components/LabelTokenCurrency'
 import useCopyClipboard from '../../../hooks/useCopyClipboard'
 import Typography from '../../../components/Typography'
 import { getBalanceOf } from '../../../functions/getBalanceOf'
+import useGetOrdersLocal from '../../../hooks/useGetOrdersLocal'
 
 function b64ToUint6(nChr) {
   return nChr > 64 && nChr < 91
@@ -199,6 +200,8 @@ function TakeOrderPage() {
   if (coinTypeToMaker == SEP206_ADDRESS[chainId]) {
     coinTypeToMaker = 'BCH'
   }
+
+  const [orders, setOrders] = useState(useGetOrdersLocal())
 
   const inputCurrency = useCurrency(coinTypeToMaker)
   const inputAmountTemp = parseUnits(order.amountToMakerBN.toString(), 0)
@@ -387,7 +390,13 @@ function TakeOrderPage() {
     await limitOrderContract.addNewDueTime(order.dueTime.toString())
     setIsCanceled(true)
   }
- 
+
+  const deleteOrderLocal = (id) => {
+    const ordersFilter = orders.map(or => or.id == id ? {...or, status: 'fulfilled'} : or)
+    setOrders(ordersFilter)
+    localStorage.setItem('orders', JSON.stringify(ordersFilter))
+  }
+
   let button = (
     <Button disabled={true} color={true ? 'gray' : 'pink'} className="mb-4">
       (<Dots>{i18n._(t`Loading order`)}</Dots>)

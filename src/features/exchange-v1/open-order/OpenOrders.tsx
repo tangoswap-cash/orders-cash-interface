@@ -24,6 +24,7 @@ const OpenOrders = ({orders, setOrders}) => {
 
   const deleteOrderLocal = (id) => {
     const ordersFilter = orders.map(or => or.id == id ? {...or, status: 'cancelled'} : or)
+    console.log('or filter:', ordersFilter);
     setOrders(ordersFilter)
     localStorage.setItem('orders', JSON.stringify(ordersFilter))
   }
@@ -42,11 +43,6 @@ const OpenOrders = ({orders, setOrders}) => {
   //   await tx.wait()
   //   await mutate((data) => ({ ...data }))
   // }
-
-  const cancelOrder = (order) => {
-    console.log('TODO cancel order', order) //TODO cancel Order
-  }
-  
 
   return (
     <>
