@@ -492,7 +492,7 @@ function TakeOrderPage() {
                   makerAddress ? 
                     <Typography variant="sm" className="flex text-primary truncate">
                       {makerAddress.substring(0, 23) + '...'} {buttonCoppy}
-                    </Typography> : 
+                    </Typography> :
                     <Dots><span/></Dots>
                 }
               </div>
