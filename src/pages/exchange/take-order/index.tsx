@@ -429,7 +429,7 @@ function TakeOrderPage() {
         )}
       </Button>
     )
-  else if (sufficientAmount == false) 
+  else if (sufficientAmount == false)
     button = (
       <Button disabled={true} color="gray">
         {i18n._(t`Maker's Balance Is Not Enough`)}
