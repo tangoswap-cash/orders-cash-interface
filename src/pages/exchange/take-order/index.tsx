@@ -252,7 +252,6 @@ function TakeOrderPage() {
   const [balanceOfMaker, setBalanceOfMaker] = useState(0);
 
   const dueTime = Math.floor(Number(order.dueTime.toString()) / 1_000_000_000)
-  console.log(order.dueTime.toString());
 
   useEffect(() => {
     const now = new Date().getTime()
@@ -315,6 +314,7 @@ function TakeOrderPage() {
           swapErrorMessage: undefined,
           txHash: hash,
         })
+        fillOrderLocal()
       })
       .catch((error) => {
         setSwapState({
@@ -389,12 +389,21 @@ function TakeOrderPage() {
   const cancelOrderCall = async () => {
     await limitOrderContract.addNewDueTime(order.dueTime.toString())
     setIsCanceled(true)
+    orders.map(order => {
+      const id = order.id
+      const ordersFilter = orders.map(or => or.id == id ? {...or, status: 'cancelled'} : or)
+      setOrders(ordersFilter)
+      localStorage.setItem('orders', JSON.stringify(ordersFilter))
+    })
   }
 
-  const deleteOrderLocal = (id) => {
-    const ordersFilter = orders.map(or => or.id == id ? {...or, status: 'fulfilled'} : or)
-    setOrders(ordersFilter)
-    localStorage.setItem('orders', JSON.stringify(ordersFilter))
+  function fillOrderLocal() {
+    orders.map(order => {
+      const id = order.id
+      const ordersFilter = orders.map(or => or.id == id ? {...or, status: 'filled'} : or)
+      setOrders(ordersFilter)
+      localStorage.setItem('orders', JSON.stringify(ordersFilter))
+    })
   }
 
   let button = (
