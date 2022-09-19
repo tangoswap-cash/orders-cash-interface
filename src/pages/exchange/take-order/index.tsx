@@ -373,7 +373,7 @@ function TakeOrderPage() {
   } else if (outputCurrency?.symbol == "WBCH") {
     address = chainId && WBCHADDRESS;
   }
-  const outputTokenContract = useContract(chainId && BCHADDRESS, SUSHI_ABI, true)
+  const outputTokenContract = useContract(chainId && address, SUSHI_ABI, true)
   getBalanceOf(outputTokenContract, makerAddress).then((balance) => {
     setBalanceOfMaker(balance)
   })
