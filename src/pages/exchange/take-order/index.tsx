@@ -379,7 +379,6 @@ function TakeOrderPage() {
   })
   sufficientAmount = balanceOfMaker >= makerPayment
     
-  const [isCanceled, setIsCanceled] = useState(false)
 
   const [isCanceled, setIsCanceled] = useState(false)
 
