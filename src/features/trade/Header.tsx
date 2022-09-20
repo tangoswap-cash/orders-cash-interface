@@ -55,7 +55,7 @@ const ExchangeHeader: FC<ExchangeHeaderProps> = ({ input, output, allowedSlippag
             query: getQuery(input, output),
           }}
         >
-          <a className="flex items-center justify-center px-4 text-base font-medium text-center rounded-md text-high-emphesis hover:text-secondary ">
+          <a className="flex items-center justify-center px-4 text-base font-medium text-center rounded-md text-high-emphesis hover:text-green ">
             {i18n._(t`Limit Order`)}
           </a>
         </NavLink>
