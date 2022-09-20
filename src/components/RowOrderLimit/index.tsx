@@ -16,7 +16,8 @@ function RowOrderLimit({order, deleteOrderLocal}){
   const [isCopied, setCopied] = useCopyClipboard(1000)
 
   const cancelOrder = async (order) => {
-    await limitOrderContract.addNewDueTime(order.dueTime.toLocaleString('fullwide', {useGrouping:false})) 
+    console.log(order.dueTime)
+    await limitOrderContract.addNewDueTime(order.dueTime) 
     deleteOrderLocal(order.id)
   }
   
