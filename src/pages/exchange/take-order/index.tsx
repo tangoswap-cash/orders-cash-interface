@@ -410,7 +410,6 @@ function TakeOrderPage() {
       (<Dots>{i18n._(t`Loading order`)}</Dots>)
     </Button>
   )
-  
   if (!account)
     button = (
       <Button color="pink" onClick={toggleWalletModal}>
