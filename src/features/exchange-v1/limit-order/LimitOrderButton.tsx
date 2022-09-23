@@ -239,7 +239,6 @@ const LimitOrderButton: FC<LimitOrderButtonProps> = ({ currency, color, ...rest 
 
       setTakeOrderURL(url)
       setOpenConfirmationModal(false)
-      
       if (true) {
         // console.log('openOrderToLocalStorage: ',openOrderToLocalStorage)
         postOrderLocal(openOrderToLocalStorage)
