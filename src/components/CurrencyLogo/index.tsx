@@ -54,7 +54,6 @@ interface CurrencyLogoProps {
 
 const unknown = 'https://raw.githubusercontent.com/tangoswap-cash/icons/master/token/unknown.png'
 
-
 const CurrencyLogo: FunctionComponent<CurrencyLogoProps> = ({
   currency,
   size = '24px',
