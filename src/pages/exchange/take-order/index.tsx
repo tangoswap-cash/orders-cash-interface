@@ -378,10 +378,10 @@ function TakeOrderPage() {
   } else if (outputCurrency?.symbol == "WBCH") {
     address = chainId && WBCHADDRESS;
   }
-    const outputTokenContract = useContract(chainId && address, SUSHI_ABI, true) 
-    getBalanceOf(outputTokenContract, makerAddress).then((balance) => {
-      setBalanceOfMaker(balance)
-    })
+  const outputTokenContract = useContract(chainId && address, SUSHI_ABI, true) 
+  getBalanceOf(outputTokenContract, makerAddress).then((balance) => {
+    setBalanceOfMaker(balance)
+  })
   sufficientAmount = balanceOfMaker >= makerPayment
     
   const [isCanceled, setIsCanceled] = useState(false)
