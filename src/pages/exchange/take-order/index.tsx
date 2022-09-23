@@ -493,7 +493,7 @@ function TakeOrderPage() {
               <div className="flex gap-2 text-xl font-bold text-white">{i18n._(t`You receive:`)}</div>
               <LabelTokenCurrency
                 currency={outputCurrency}
-                parsedAmount={parsedOutputAmount?.toSignificant(6)} 
+                parsedAmount={parsedOutputAmount?.toSignificant(6)}
                 tokenAddress={outputCurrency?.wrapped?.address}
                />
             </div>
