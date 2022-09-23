@@ -531,7 +531,7 @@ function TakeOrderPage() {
                 :
                 makerAddress ? 
                   sufficientAmount ?
-                     i18n._(t`Available`) 
+                     i18n._(t`Available`)
                    : i18n._(t`Maker's Balance Is Not Enough`)
                    : <Dots><span/></Dots>
                 }
