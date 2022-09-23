@@ -335,7 +335,6 @@ function TakeOrderPage() {
     [Field.INPUT]: relevantTokenBalances[0],
     [Field.OUTPUT]: relevantTokenBalances[1],
   }
-  
 
   let inputError: string | undefined
   if (!account) {
