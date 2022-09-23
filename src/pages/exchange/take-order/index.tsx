@@ -452,7 +452,6 @@ function TakeOrderPage() {
         {i18n._(t`Maker's Balance Is Not Enough`)}
       </Button>
     )
- 
   else {
     button = (
       <ButtonError onClick={handleSwap} id="swap-button" disabled={disabled} error={disabled}>
