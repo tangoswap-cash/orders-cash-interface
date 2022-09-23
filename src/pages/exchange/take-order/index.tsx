@@ -44,6 +44,7 @@ import LabelTokenCurrency from '../../../components/LabelTokenCurrency'
 import useCopyClipboard from '../../../hooks/useCopyClipboard'
 import Typography from '../../../components/Typography'
 import { getBalanceOf } from '../../../functions/getBalanceOf'
+import useGetOrdersLocal from '../../../hooks/useGetOrdersLocal'
 
 function b64ToUint6(nChr) {
   return nChr > 64 && nChr < 91
@@ -200,6 +201,8 @@ function TakeOrderPage() {
     coinTypeToMaker = 'BCH'
   }
 
+  const [orders, setOrders] = useState(useGetOrdersLocal())
+
   const inputCurrency = useCurrency(coinTypeToMaker)
   const inputAmountTemp = parseUnits(order.amountToMakerBN.toString(), 0)
 
@@ -312,6 +315,7 @@ function TakeOrderPage() {
           swapErrorMessage: undefined,
           txHash: hash,
         })
+        fillOrderLocal()
       })
       .catch((error) => {
         setSwapState({
@@ -359,6 +363,7 @@ function TakeOrderPage() {
     inputError = i18n._(t`Order Fulfilled`)
   }
 
+
   const disabled = !!inputError || tokenApprovalState === ApprovalState.PENDING
 
   let sufficientAmount = false;
@@ -378,6 +383,28 @@ function TakeOrderPage() {
     setBalanceOfMaker(balance)
   })
   sufficientAmount = balanceOfMaker >= makerPayment
+    
+  const [isCanceled, setIsCanceled] = useState(false)
+
+  const cancelOrderCall = async () => {
+    await limitOrderContract.addNewDueTime(order.dueTime.toString())
+    setIsCanceled(true)
+    orders.map(order => {
+      const id = order.id
+      const ordersFilter = orders.map(or => or.id == id ? {...or, status: 'cancelled'} : or)
+      setOrders(ordersFilter)
+      localStorage.setItem('orders', JSON.stringify(ordersFilter))
+    })
+  }
+
+  function fillOrderLocal() {
+    orders.map(order => {
+      const id = order.id
+      const ordersFilter = orders.map(or => or.id == id ? {...or, status: 'filled'} : or)
+      setOrders(ordersFilter)
+      localStorage.setItem('orders', JSON.stringify(ordersFilter))
+    })
+  }
 
   const [isCanceled, setIsCanceled] = useState(false)
 
@@ -508,7 +535,7 @@ function TakeOrderPage() {
                 :
                 makerAddress ? 
                   sufficientAmount ?
-                    i18n._(t`Available`)
+                     i18n._(t`Available`)
                    : i18n._(t`Maker's Balance Is Not Enough`)
                    : <Dots><span/></Dots>
                 }
