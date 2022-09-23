@@ -252,6 +252,7 @@ function TakeOrderPage() {
   const [balanceOfMaker, setBalanceOfMaker] = useState(0);
 
   const dueTime = Math.floor(Number(order.dueTime.toString()) / 1_000_000_000)
+  console.log(order.dueTime.toString());
 
   useEffect(() => {
     const now = new Date().getTime()
@@ -377,7 +378,7 @@ function TakeOrderPage() {
   } else if (outputCurrency?.symbol == "WBCH") {
     address = chainId && WBCHADDRESS;
   }
-  const outputTokenContract = useContract(chainId && address, SUSHI_ABI, true) 
+  const outputTokenContract = useContract(chainId && address, SUSHI_ABI, true)
   getBalanceOf(outputTokenContract, makerAddress).then((balance) => {
     setBalanceOfMaker(balance)
   })
@@ -405,6 +406,13 @@ function TakeOrderPage() {
     })
   }
 
+  const [isCanceled, setIsCanceled] = useState(false)
+
+  const cancelOrderCall = async () => {
+    await limitOrderContract.addNewDueTime(order.dueTime.toString())
+    setIsCanceled(true)
+  }
+ 
   let button = (
     <Button disabled={true} color={true ? 'gray' : 'pink'} className="mb-4">
       (<Dots>{i18n._(t`Loading order`)}</Dots>)
