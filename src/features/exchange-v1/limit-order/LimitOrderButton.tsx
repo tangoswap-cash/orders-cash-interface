@@ -3,6 +3,7 @@ import {
   ChainId,
   computeConstantProductPoolAddress,
   Currency,
+  OrderStatus,
   ORDERS_CASH_V1_ADDRESS,
   Price,
   SEP206_ADDRESS,
@@ -18,6 +19,7 @@ import useCopyClipboard from '../../../hooks/useCopyClipboard'
 import { useLimitOrderApproveCallback } from '../../../hooks/useLimitOrderApproveCallback'
 import Alert from '../../../components/Alert'
 import { AppDispatch } from '../../../state'
+import { arrayify, hexlify, splitSignature } from '@ethersproject/bytes'
 import ConfirmLimitOrderModal from './ConfirmLimitOrderModal'
 import Dots from '../../../components/Dots'
 import { LimitOrder } from '@tangoswapcash/sdk'
@@ -36,6 +38,7 @@ import { faTelegram } from '@fortawesome/free-brands-svg-icons';
 import axios from 'axios'
 import { faCheck } from '@fortawesome/free-solid-svg-icons'
 import CashAddressInput from '../../../components/Input/Cashaddress'
+import useGetOrdersLocal from '../../../hooks/useGetOrdersLocal'
 
 interface LimitOrderButtonProps extends ButtonProps {
   currency: Currency
@@ -90,7 +93,6 @@ const LimitOrderButton: FC<LimitOrderButtonProps> = ({ currency, color, ...rest 
   const dispatch = useDispatch<AppDispatch>()
   const addPopup = useAddPopup()
   const toggleWalletModal = useWalletModalToggle()
-
   const [openConfirmationModal, setOpenConfirmationModal] = useState(false)
   const [takeOrderURL, setTakeOrderURL] = useState<string>(null)
 
@@ -98,8 +100,9 @@ const LimitOrderButton: FC<LimitOrderButtonProps> = ({ currency, color, ...rest 
   const [clicked, wasClicked] = useState(false)
   const [endTimeState, setEndTimeState] = useState<string>(null)
 
+  const [orders, setOrders] = useState(useGetOrdersLocal());
   const { orderExpiration, recipient } = useLimitOrderState()
-  const { parsedAmounts, inputError } = useDerivedLimitOrderInfo()
+  const { parsedAmounts, inputError, currencies } = useDerivedLimitOrderInfo()
 
   const { mutate } = useLimitOrders()
 
@@ -115,6 +118,13 @@ const LimitOrderButton: FC<LimitOrderButtonProps> = ({ currency, color, ...rest 
     (tokenApprovalState === ApprovalState.NOT_APPROVED || tokenApprovalState === ApprovalState.PENDING)
 
   const disabled = !!inputError || tokenApprovalState === ApprovalState.PENDING
+
+  const postOrderLocal = (newOrder) => {
+    // console.log('antes: ', orders)
+    // console.log('Pal local: ', {loading: false, orders: [...orders, newOrder]})
+    localStorage.setItem('orders', JSON.stringify([...orders, newOrder]))
+    // console.log("Status: ", newOrder?.status)
+  }
 
   const handler = useCallback(async () => {
     const signer = library.getSigner()
@@ -187,7 +197,40 @@ const LimitOrderButton: FC<LimitOrderButtonProps> = ({ currency, color, ...rest 
       ],
     }
 
+    const rawDueTime = expirePicosecondsBN._hex // returns a hex, in the call to Sign the transaction it formats to number automatically.
+
+    // let outputValue = parsedAmounts[Field.OUTPUT]?.toSignificant(6)
+    // let inputValue = parsedAmounts[Field.INPUT]?.toSignificant(6)
+    // let openOrderToLocalStorage = {
+    //   id: Date.now(),
+    //   account,
+    //   input: {value: inputValue, currency: currencies[Field.INPUT]?.tokenInfo || {...currencies[Field.INPUT], address: currencies[Field.INPUT]?.wrapped.address}},
+    //   output: {value: outputValue, currency: currencies[Field.OUTPUT]?.tokenInfo || currencies[Field.OUTPUT]},
+    //   orderExpiration: orderExpiration.label,
+    //   dueTime: rawDueTime,
+    //   status: 'open',
+    //   rate: Number((parseFloat(outputValue) / parseFloat(inputValue))?.toFixed(2))
+    // }
+    // // console.log('openOrderToLocalStorage: ', openOrderToLocalStorage)
+
     try {
+      let outputValue = parsedAmounts[Field.OUTPUT]?.toSignificant(6)
+      let inputValue = parsedAmounts[Field.INPUT]?.toSignificant(6)
+      let openOrderToLocalStorage = {
+        id: Date.now(),
+        account,
+        // input: {value: inputValue, currency: currencies[Field.INPUT]?.tokenInfo || {...currencies[Field.INPUT], address: currencies[Field.INPUT]?.wrapped.address}},
+        // output: {value: outputValue, currency: currencies[Field.OUTPUT]?.tokenInfo || currencies[Field.OUTPUT]},
+
+        input: {value: inputValue, currency: {...currencies[Field.INPUT], address: currencies[Field.INPUT]?.wrapped.address}},
+        output: {value: outputValue, currency: currencies[Field.OUTPUT]},
+
+        orderExpiration: orderExpiration.label,
+        dueTime: rawDueTime,
+        status: 'open',
+        rate: Number((parseFloat(outputValue) / parseFloat(inputValue))?.toFixed(2))
+      }
+
       const sig = await signer._signTypedData(Domain, Types, msg)
       // o=ver8,coinsToMaker256,coinsToTaker256,dueTime80,r256,s256,v8
       const order = '01'
@@ -197,19 +240,18 @@ const LimitOrderButton: FC<LimitOrderButtonProps> = ({ currency, color, ...rest 
         + sig.substr(2)
 
       const url = 'https://orders.cash/take?o=' + base64EncArr(hexToArr(order))
-      console.log('url: ', url)
+
       setTakeOrderURL(url)
-
       setOpenConfirmationModal(false)
-
       if (true) {
+        // console.log('openOrderToLocalStorage: ',openOrderToLocalStorage)
+        postOrderLocal(openOrderToLocalStorage)
         addPopup({
           txn: { hash: null, summary: 'Limit order created', success: true },
         })
         await mutate()
       }
     } catch (e) {
-      console.log('error: ', e)
       addPopup({
         txn: {
           hash: null,
@@ -252,7 +294,7 @@ const LimitOrderButton: FC<LimitOrderButtonProps> = ({ currency, color, ...rest 
     )
 
     const ret = await axios.post(`https://orders.cash/api/telegram?url=${takeOrderURL}&endTime=${endTimeState}&fromToken=${parsedAmounts[Field.INPUT].currency.symbol}&fromAmount=${parsedAmounts[Field.INPUT].toSignificant(6)}&toToken=${parsedAmounts[Field.OUTPUT].currency.symbol}&toAmount=${parsedAmounts[Field.OUTPUT].toSignificant(6)}&price=${limitPrice.toSignificant(6)}&priceInvert=${limitPrice.invert().toSignificant(6)}`)
-    console.log("telegram post result: ", ret);
+    // console.log("telegram post result: ", ret);
     wasClicked(true)
   }
 
@@ -304,16 +346,16 @@ const LimitOrderButton: FC<LimitOrderButtonProps> = ({ currency, color, ...rest 
 
   return (
     <div className="flex flex-col flex-1">
-      {takeOrderURL && 
+      {takeOrderURL &&
         <div className="flex flex-1 mb-3 pl-2 items-center rounded border border-dark-800">
           <LinkIcon width={16} height={16}/>
-          <CashAddressInput 
-            onUserInput={null} 
-            value={takeOrderURL} 
-            fontSize='15px' 
+          <CashAddressInput
+            onUserInput={null}
+            value={takeOrderURL}
+            fontSize='15px'
             className='disabled py-0 px-3 mb-0 '
             onClick={() => setCopied(takeOrderURL)}
-          /> 
+          />
           <Button
             data-tooltip-target="tooltip-copy"
             className="flex justify-center items-center px-2"
@@ -337,7 +379,6 @@ const LimitOrderButton: FC<LimitOrderButtonProps> = ({ currency, color, ...rest 
           </Button>
         </div>
       }
-
       {button}
 
       <style jsx>{`

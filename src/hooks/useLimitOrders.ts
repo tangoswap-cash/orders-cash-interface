@@ -162,7 +162,7 @@ const useLimitOrders = () => {
     //     },
     //   }))
     // })()
-
+    
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [account, chainId, ordersData, limitOrderContract, setPendingPage, setCompletedPage])
 
