@@ -383,7 +383,7 @@ function TakeOrderPage() {
     setBalanceOfMaker(balance)
   })
   sufficientAmount = balanceOfMaker >= makerPayment
-    
+
   const [isCanceled, setIsCanceled] = useState(false)
 
   const cancelOrderCall = async () => {
@@ -406,13 +406,6 @@ function TakeOrderPage() {
     })
   }
 
-  const [isCanceled, setIsCanceled] = useState(false)
-
-  const cancelOrderCall = async () => {
-    await limitOrderContract.addNewDueTime(order.dueTime.toString())
-    setIsCanceled(true)
-  }
- 
   let button = (
     <Button disabled={true} color={true ? 'gray' : 'pink'} className="mb-4">
       (<Dots>{i18n._(t`Loading order`)}</Dots>)
@@ -424,12 +417,12 @@ function TakeOrderPage() {
         {i18n._(t`Connect Wallet`)}
       </Button>
     )
-  else if (makerAddress || inputError == `Insufficient ${currencies[Field.INPUT]?.symbol} balance`) 
+  else if (makerAddress || inputError == `Insufficient ${currencies[Field.INPUT]?.symbol} balance`)
     if (account == makerAddress && inputError !== "Order Fulfilled") {
-      !isCanceled ? 
+      !isCanceled ?
       button = (
       <Button color='pink' onClick={cancelOrderCall}>
-        {i18n._(t`Cancel Order`)} 
+        {i18n._(t`Cancel Order`)}
       </Button>
       )
       : button = (
@@ -525,15 +518,15 @@ function TakeOrderPage() {
             <div className="flex justify-between px-5 py-1">
               <span className="font-bold text-secondary">{i18n._(t`Order status`)}</span>
               <span className="text-primary ">
-                {isCanceled ? 
-                  i18n._(t`Order Canceled`) 
+                {isCanceled ?
+                  i18n._(t`Order Canceled`)
                 :
-                inputError ? 
+                inputError ?
                  inputError !== `Insufficient ${currencies[Field.INPUT]?.symbol} balance` ?
                   inputError
-                : i18n._(t`Available`) 
+                : i18n._(t`Available`)
                 :
-                makerAddress ? 
+                makerAddress ?
                   sufficientAmount ?
                      i18n._(t`Available`)
                    : i18n._(t`Maker's Balance Is Not Enough`)
