@@ -199,19 +199,22 @@ const LimitOrderButton: FC<LimitOrderButtonProps> = ({ currency, color, ...rest 
 
     const rawDueTime = expirePicosecondsBN._hex // returns a hex, in the call to Sign the transaction it formats to number automatically.
 
-    // let outputValue = parsedAmounts[Field.OUTPUT]?.toSignificant(6)
-    // let inputValue = parsedAmounts[Field.INPUT]?.toSignificant(6)
-    // let openOrderToLocalStorage = {
-    //   id: Date.now(),
-    //   account,
-    //   input: {value: inputValue, currency: currencies[Field.INPUT]?.tokenInfo || {...currencies[Field.INPUT], address: currencies[Field.INPUT]?.wrapped.address}},
-    //   output: {value: outputValue, currency: currencies[Field.OUTPUT]?.tokenInfo || currencies[Field.OUTPUT]},
-    //   orderExpiration: orderExpiration.label,
-    //   dueTime: rawDueTime,
-    //   status: 'open',
-    //   rate: Number((parseFloat(outputValue) / parseFloat(inputValue))?.toFixed(2))
-    // }
-    // // console.log('openOrderToLocalStorage: ', openOrderToLocalStorage)
+    let outputValue = parsedAmounts[Field.OUTPUT]?.toSignificant(6)
+    let inputValue = parsedAmounts[Field.INPUT]?.toSignificant(6)
+    let openOrderToLocalStorage = {
+      id: Date.now(),
+      account,
+      // input: {value: inputValue, currency: currencies[Field.INPUT]?.tokenInfo || {...currencies[Field.INPUT], address: currencies[Field.INPUT]?.wrapped.address}},
+      // output: {value: outputValue, currency: currencies[Field.OUTPUT]?.tokenInfo || currencies[Field.OUTPUT]},
+      input: {value: inputValue, currency: {...currencies[Field.INPUT], address: currencies[Field.INPUT]?.wrapped.address}},
+      output: {value: outputValue, currency: currencies[Field.OUTPUT]},
+
+      orderExpiration: orderExpiration.label,
+      dueTime: rawDueTime,
+      status: 'open',
+      rate: Number((parseFloat(outputValue) / parseFloat(inputValue))?.toFixed(2))
+    }
+    // console.log('openOrderToLocalStorage: ', openOrderToLocalStorage)
 
     try {
       let outputValue = parsedAmounts[Field.OUTPUT]?.toSignificant(6)
