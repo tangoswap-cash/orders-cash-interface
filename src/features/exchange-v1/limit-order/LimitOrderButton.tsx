@@ -39,6 +39,7 @@ import axios from 'axios'
 import { faCheck } from '@fortawesome/free-solid-svg-icons'
 import CashAddressInput from '../../../components/Input/Cashaddress'
 import useGetOrdersLocal from '../../../hooks/useGetOrdersLocal'
+import { WrappedTokenInfo } from '../../../state/lists/wrappedTokenInfo'
 
 interface LimitOrderButtonProps extends ButtonProps {
   currency: Currency
@@ -196,31 +197,47 @@ const LimitOrderButton: FC<LimitOrderButtonProps> = ({ currency, color, ...rest 
         { name: 'dueTime80', type: 'uint256' },
       ],
     }
+
+    const rawDueTime = expirePicosecondsBN._hex // returns a hex, in the call to Sign the transaction it formats to number automatically.
+
+    // let outputValue = parsedAmounts[Field.OUTPUT]?.toSignificant(6)
+    // let inputValue = parsedAmounts[Field.INPUT]?.toSignificant(6)
+    // let openOrderToLocalStorage = {
+    //   id: Date.now(),
+    //   account,
+    //   input: {value: inputValue, currency: currencies[Field.INPUT]?.tokenInfo || {...currencies[Field.INPUT], address: currencies[Field.INPUT]?.wrapped.address}},
+    //   output: {value: outputValue, currency: currencies[Field.OUTPUT]?.tokenInfo || currencies[Field.OUTPUT]},
+    //   orderExpiration: orderExpiration.label,
+    //   dueTime: rawDueTime,
+    //   status: 'open',
+    //   rate: Number((parseFloat(outputValue) / parseFloat(inputValue))?.toFixed(2))
+    // }
+    // // console.log('openOrderToLocalStorage: ', openOrderToLocalStorage)
     
-  const rawDueTime = expirePicosecondsBN._hex // returns a hex, in the call to Sign the transaction it formats to number automatically.
-
-  let outputValue = parsedAmounts[Field.OUTPUT]?.toSignificant(6)
-  let inputValue = parsedAmounts[Field.INPUT]?.toSignificant(6)
-  let openOrderToLocalStorage = {
-    id: Date.now(),
-    account,
-    input: {value: inputValue, currency: currencies[Field.INPUT]?.tokenInfo || {...currencies[Field.INPUT], address: currencies[Field.INPUT]?.wrapped.address}},
-    output: {value: outputValue, currency: currencies[Field.OUTPUT]?.tokenInfo || currencies[Field.OUTPUT]},
-    orderExpiration: orderExpiration.label,
-    dueTime: rawDueTime,
-    status: 'open',
-    rate: Number((parseFloat(outputValue) / parseFloat(inputValue))?.toFixed(2))
-  }
-  // console.log('openOrderToLocalStorage: ', openOrderToLocalStorage)
-
     try {
       let outputValue = parsedAmounts[Field.OUTPUT]?.toSignificant(6)
       let inputValue = parsedAmounts[Field.INPUT]?.toSignificant(6)
+      let inputCurrency
+      let outputCurrency
+      if (currencies[Field.INPUT] instanceof WrappedTokenInfo) {
+        inputCurrency = (currencies[Field.INPUT] as WrappedTokenInfo).tokenInfo
+      } else {
+        inputCurrency = currencies[Field.INPUT]
+      }
+      if (currencies[Field.OUTPUT] instanceof WrappedTokenInfo) {
+        outputCurrency = (currencies[Field.OUTPUT] as WrappedTokenInfo).tokenInfo
+      } else {
+        outputCurrency = currencies[Field.OUTPUT]
+      }
       let openOrderToLocalStorage = {
         id: Date.now(),
         account,
-        input: {value: inputValue, currency: currencies[Field.INPUT]?.tokenInfo || {...currencies[Field.INPUT], address: currencies[Field.INPUT]?.wrapped.address}},
-        output: {value: outputValue, currency: currencies[Field.OUTPUT]?.tokenInfo || currencies[Field.OUTPUT]},
+        input: {value: inputValue, currency: inputCurrency || {...currencies[Field.INPUT], address: currencies[Field.INPUT]?.wrapped.address}},
+        output: {value: outputValue, currency: outputCurrency || currencies[Field.OUTPUT]},
+
+        // input: {value: inputValue, currency: inputCurrency || {...currencies[Field.INPUT], address: currencies[Field.INPUT]?.wrapped.address}},
+        // output: {value: outputValue, currency: currencies[Field.OUTPUT]},
+                
         orderExpiration: orderExpiration.label,
         dueTime: rawDueTime,
         status: 'open',
@@ -239,7 +256,6 @@ const LimitOrderButton: FC<LimitOrderButtonProps> = ({ currency, color, ...rest 
 
       setTakeOrderURL(url)
       setOpenConfirmationModal(false)
-      
       if (true) {
         // console.log('openOrderToLocalStorage: ',openOrderToLocalStorage)
         postOrderLocal(openOrderToLocalStorage)
@@ -343,16 +359,16 @@ const LimitOrderButton: FC<LimitOrderButtonProps> = ({ currency, color, ...rest 
 
   return (
     <div className="flex flex-col flex-1">
-      {takeOrderURL && 
+      {takeOrderURL &&
         <div className="flex flex-1 mb-3 pl-2 items-center rounded border border-dark-800">
           <LinkIcon width={16} height={16}/>
-          <CashAddressInput 
-            onUserInput={null} 
-            value={takeOrderURL} 
-            fontSize='15px' 
+          <CashAddressInput
+            onUserInput={null}
+            value={takeOrderURL}
+            fontSize='15px'
             className='disabled py-0 px-3 mb-0 '
             onClick={() => setCopied(takeOrderURL)}
-          /> 
+          />
           <Button
             data-tooltip-target="tooltip-copy"
             className="flex justify-center items-center px-2"
