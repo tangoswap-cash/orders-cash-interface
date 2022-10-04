@@ -83,6 +83,8 @@ export default function WalletModal({
 
   const [walletView, setWalletView] = useState(WALLET_VIEWS.ACCOUNT)
 
+  const [oldMetamask, setOldMetamask] = useState(window.ethereum)
+
   const [pendingWallet, setPendingWallet] = useState<AbstractConnector | undefined>()
 
   const [pendingError, setPendingError] = useState<boolean>()
@@ -121,6 +123,8 @@ export default function WalletModal({
     let name = ''
     let conn = typeof connector === 'function' ? await connector() : connector
 
+    window.ethereum = oldMetamask // implemented to make compatible the Nabox Wallet. This returns window.ethereum to it's original state
+
     Object.keys(SUPPORTED_WALLETS).map((key) => {
       if (connector === SUPPORTED_WALLETS[key].connector) {
         return (name = SUPPORTED_WALLETS[key].name)
@@ -143,6 +147,21 @@ export default function WalletModal({
           setPendingError(true)
         }
       })
+  }
+
+  const naboxActivation = async (connector: (() => Promise<AbstractConnector>) | AbstractConnector | undefined) => {
+    let conn = typeof connector === 'function' ? await connector() : connector
+
+    setPendingWallet(conn) // set wallet for pending view
+    setWalletView(WALLET_VIEWS.PENDING)
+
+    activate(conn, undefined, true).catch((error) => {
+      if (error instanceof UnsupportedChainIdError) {
+        activate(conn) // a little janky...can't use setError because the connector isn't set
+      } else {
+        setPendingError(true)
+      }
+    })
   }
 
   // close wallet modal if fortmatic modal is active
@@ -186,6 +205,10 @@ export default function WalletModal({
     }
   }
 
+  const connectToNabox = async (conn): Promise<void> => {
+    window.ethereum = window.NaboxWallet
+    naboxActivation(conn)
+  }
   // get wallets user can switch too, depending on device/browser
   function getOptions() {
     const isMetamask = window.ethereum && window.ethereum.isMetaMask
@@ -253,7 +276,9 @@ export default function WalletModal({
           <Option
             id={`connect-${key}`}
             onClick={() => {
-              option.connector === connector
+              option.name == 'Nabox'
+              ? connectToNabox(option.connector)
+              : option.connector === connector
                 ? setWalletView(WALLET_VIEWS.ACCOUNT)
                 : !option.href && tryActivation(option.connector)
             }}
